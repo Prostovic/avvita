@@ -31,6 +31,7 @@ use Yii;
  */
 class User extends \yii\db\ActiveRecord
 {
+    public $isAgree;
     /**
      * @inheritdoc
      */
@@ -45,8 +46,8 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['us_fam', 'us_name', 'us_email', 'us_adr_post', 'us_birth', 'us_pass', 'us_position', 'us_city', 'us_org', 'us_getnews', 'us_getstate', 'isAgree', ], 'required'],
             [['us_active', 'us_position', 'us_getnews', 'us_getstate'], 'integer'],
-            [['us_fam', 'us_name', 'us_otch', 'us_email', 'us_adr_post', 'us_birth', 'us_pass', 'us_position', 'us_city', 'us_org', 'us_created'], 'required'],
             [['us_birth', 'us_created', 'us_confirm', 'us_activate'], 'safe'],
             [['us_fam', 'us_name', 'us_otch'], 'string', 'max' => 32],
             [['us_email'], 'string', 'max' => 64],
@@ -67,14 +68,14 @@ class User extends \yii\db\ActiveRecord
             'us_fam' => 'Фамилия',
             'us_name' => 'Имя',
             'us_otch' => 'Отчество',
-            'us_email' => 'Электронная почта',
+            'us_email' => 'Email',
             'us_phone' => 'Телефон',
             'us_adr_post' => 'Адрес доставки',
             'us_birth' => 'Дата рождения',
             'us_pass' => 'Пароль',
             'us_position' => 'Специализация',
             'us_city' => 'Город',
-            'us_org' => 'Название организации',
+            'us_org' => 'Организация',
             'us_city_id' => 'id города',
             'us_org_id' => 'id организации',
             'us_created' => 'Создан',
@@ -83,6 +84,7 @@ class User extends \yii\db\ActiveRecord
             'us_getnews' => 'Инф. об акциях',
             'us_getstate' => 'Инф. о бонусах',
             'us_group' => 'Группа',
+            'isAgree' => 'Согласие на обработку',
         ];
     }
 
@@ -103,7 +105,17 @@ class User extends \yii\db\ActiveRecord
                 'us_org',
                 'us_getnews',
                 'us_getstate',
+                'isAgree',
             ],
+        ];
+    }
+
+    public function getPositions() {
+        return [
+            1 => 'Врач',
+            2 => 'Оптометрист',
+            3 => 'Продавец-консультант',
+            4 => 'Другое',
         ];
     }
 }

@@ -89,3 +89,8 @@ a.desc:after {
     padding: 10px 20px;
     margin: 0 0 15px 0;
 }
+
+.width1_3 {
+    width: 33.3%;
+    float: left;
+}
