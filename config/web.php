@@ -8,6 +8,8 @@ $sfWebLocal = __DIR__ . DIRECTORY_SEPARATOR . 'web-local.php';
 
 $config = [
     'id' => 'app',
+    'language' => 'ru',
+    'name' => 'Аввита бонус-портал',
     'components' => [
         'user' => [
             'identityClass' => 'app\models\User',

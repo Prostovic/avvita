@@ -2,102 +2,85 @@
 
 namespace app\models;
 
-class User extends \yii\base\Object implements \yii\web\IdentityInterface
+use Yii;
+
+/**
+ * This is the model class for table "{{%user}}".
+ *
+ * @property integer $us_id
+ * @property integer $us_active
+ * @property string $us_fam
+ * @property string $us_name
+ * @property string $us_otch
+ * @property string $us_email
+ * @property string $us_phone
+ * @property string $us_adr_post
+ * @property string $us_birth
+ * @property string $us_pass
+ * @property integer $us_position
+ * @property string $us_city
+ * @property string $us_org
+ * @property string $us_city_id
+ * @property string $us_org_id
+ * @property string $us_created
+ * @property string $us_confirm
+ * @property string $us_activate
+ * @property integer $us_getnews
+ * @property integer $us_getstate
+ */
+class User extends \yii\db\ActiveRecord
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
     /**
      * @inheritdoc
      */
-    public static function findIdentity($id)
+    public static function tableName()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return '{{%user}}';
     }
 
     /**
      * @inheritdoc
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public function rules()
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param  string      $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return [
+            [['us_active', 'us_position', 'us_getnews', 'us_getstate'], 'integer'],
+            [['us_fam', 'us_name', 'us_otch', 'us_email', 'us_adr_post', 'us_birth', 'us_pass', 'us_position', 'us_city', 'us_org', 'us_created'], 'required'],
+            [['us_birth', 'us_created', 'us_confirm', 'us_activate'], 'safe'],
+            [['us_fam', 'us_name', 'us_otch'], 'string', 'max' => 32],
+            [['us_email'], 'string', 'max' => 64],
+            [['us_phone'], 'string', 'max' => 24],
+            [['us_adr_post', 'us_pass', 'us_city', 'us_org'], 'string', 'max' => 255],
+            [['us_city_id', 'us_org_id'], 'string', 'max' => 16]
+        ];
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function attributeLabels()
     {
-        return $this->id;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAuthKey()
-    {
-        return $this->authKey;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
-     *
-     * @param  string  $password password to validate
-     * @return boolean if password provided is valid for current user
-     */
-    public function validatePassword($password)
-    {
-        return $this->password === $password;
+        return [
+            'us_id' => 'Us ID',
+            'us_active' => 'Активен',
+            'us_fam' => 'Фамилия',
+            'us_name' => 'Имя',
+            'us_otch' => 'Отчество',
+            'us_email' => 'Электронная почта',
+            'us_phone' => 'Телефон',
+            'us_adr_post' => 'Адрес доставки',
+            'us_birth' => 'Дата рождения',
+            'us_pass' => 'Пароль',
+            'us_position' => 'Специализация',
+            'us_city' => 'Город',
+            'us_org' => 'Название организации',
+            'us_city_id' => 'id города',
+            'us_org_id' => 'id организации',
+            'us_created' => 'Создан',
+            'us_confirm' => 'Подтвержден',
+            'us_activate' => 'Проверен',
+            'us_getnews' => 'Инф. об акциях',
+            'us_getstate' => 'Инф. о бонусах',
+        ];
     }
 }
