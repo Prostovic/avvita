@@ -15,6 +15,7 @@ class m151107_092244_add_userdara_table extends Migration
         $tableOptionsMyISAM = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=MyISAM';
         $this->createTable('{{%user}}', [
             'us_id' => Schema::TYPE_PK,
+            'us_group' => Schema::TYPE_STRING . '(16) Not Null Comment \'Группа\'',
             'us_active' => Schema::TYPE_SMALLINT . ' Default 1 Comment \'Активен\'',
             'us_fam' => Schema::TYPE_STRING . '(32) Not Null Comment \'Фамилия\'',
             'us_name' => Schema::TYPE_STRING . '(32) Not Null Comment \'Имя\'',

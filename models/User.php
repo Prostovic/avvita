@@ -25,6 +25,7 @@ use Yii;
  * @property string $us_created
  * @property string $us_confirm
  * @property string $us_activate
+ * @property string $us_group
  * @property integer $us_getnews
  * @property integer $us_getstate
  */
@@ -51,7 +52,7 @@ class User extends \yii\db\ActiveRecord
             [['us_email'], 'string', 'max' => 64],
             [['us_phone'], 'string', 'max' => 24],
             [['us_adr_post', 'us_pass', 'us_city', 'us_org'], 'string', 'max' => 255],
-            [['us_city_id', 'us_org_id'], 'string', 'max' => 16]
+            [['us_city_id', 'us_org_id', 'us_group'], 'string', 'max' => 16]
         ];
     }
 
@@ -81,6 +82,28 @@ class User extends \yii\db\ActiveRecord
             'us_activate' => 'Проверен',
             'us_getnews' => 'Инф. об акциях',
             'us_getstate' => 'Инф. о бонусах',
+            'us_group' => 'Группа',
+        ];
+    }
+
+    public function scenarios() {
+        return [
+            'backCreateUser' => [],
+            'register' => [
+                'us_fam',
+                'us_name',
+                'us_otch',
+                'us_email',
+                'us_phone',
+                'us_adr_post',
+                'us_birth',
+                'us_pass',
+                'us_position',
+                'us_city',
+                'us_org',
+                'us_getnews',
+                'us_getstate',
+            ],
         ];
     }
 }
