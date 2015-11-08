@@ -26,6 +26,8 @@ use Yii;
  * @property string $us_confirm
  * @property string $us_activate
  * @property string $us_group
+ * @property string $us_confirmkey
+ * @property string $us_key
  * @property integer $us_getnews
  * @property integer $us_getstate
  */
@@ -90,8 +92,9 @@ class User extends \yii\db\ActiveRecord
 
     public function scenarios() {
         return [
-            'backCreateUser' => [],
-            'register' => [
+            'backCreateUser' => [ // регистрирует админ
+            ],
+            'register' => [ // пользователи сами регистрируются
                 'us_fam',
                 'us_name',
                 'us_otch',

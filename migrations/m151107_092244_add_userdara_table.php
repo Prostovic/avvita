@@ -1,10 +1,10 @@
 <?php
 
 use yii\db\Schema;
-use yii\db\Migration;
+use app\components\BaseMigration;
 //use yii;
 
-class m151107_092244_add_userdara_table extends Migration
+class m151107_092244_add_userdara_table extends BaseMigration // Migration
 {
     public function up()
     {
@@ -46,45 +46,6 @@ class m151107_092244_add_userdara_table extends Migration
         $this->refreshCache();
     }
 
-    public function refreshCache()
-    {
-        Yii::$app->db->schema->refresh();
-        Yii::$app->db->schema->getTableSchemas();
-        $this->chmodCache();
-
-    }
-
-    public function chmodCache($sDir = null, $sOwn = null) {
-        if( $sDir === null ) {
-            $sDir = Yii::getAlias('@runtime');
-        }
-
-        if( !function_exists('posix_getuid') ) {
-            return;
-        }
-        else if($sOwn === null) {
-            $processUser = posix_getpwuid(posix_getuid());
-            $sOwn = $processUser['name'];
-        }
-
-        if( $hd = opendir($sDir) ) {
-            while( false !== ($f = readdir($hd)) ) {
-                if( ($f == '.') || ($f == '..') ) {
-                    continue;
-                }
-                $sf = $sDir . DIRECTORY_SEPARATOR . $f;
-                if( is_dir($sf) ) {
-                    $this->chmodCache($sDir, $sOwn);
-                }
-                else {
-                    chmod($sf, 0777);
-                }
-            }
-
-            closedir($hd);
-        }
-
-    }
     /*
     // Use safeUp/safeDown to run migration code within a transaction
     public function safeUp()

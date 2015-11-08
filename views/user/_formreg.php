@@ -77,14 +77,14 @@ use yii\widgets\MaskedInput;
 
     <div class="clearfix"></div>
 
-    <?= $form->field($model, 'us_getnews')->textInput() ?>
+    <?= $form->field($model, 'us_getnews', ['options' => ['class' => 'form-group col-md-12'],])->checkbox(['label' => 'Получать информацию об акциях компании Аввита']) ?>
 
-    <?= $form->field($model, 'us_getstate')->textInput() ?>
+    <?= $form->field($model, 'us_getstate', ['options' => ['class' => 'form-group col-md-12'],])->checkbox(['label' => 'Получать информацию об изменении бонусных баллов']) ?>
 
     <div class="clearfix"></div>
 
     <div class="form-group col-md-4">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Отправить' : 'Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
