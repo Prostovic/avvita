@@ -44,7 +44,7 @@ use yii\widgets\MaskedInput;
 
     <?= $form->field($model, 'us_email')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_email')]) ?>
 
-    <?= $form->field($model, 'us_pass')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_pass')]) ?>
+    <?= $form->field($model, 'password')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('password')]) ?>
 
     <?= '' // $form->field($model, 'us_phone')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_phone')]) ?>
     <?= $form->field($model, 'us_phone')->widget(MaskedInput::classname(), [
@@ -80,6 +80,8 @@ use yii\widgets\MaskedInput;
     <?= $form->field($model, 'us_getnews', ['options' => ['class' => 'form-group col-md-12'],])->checkbox(['label' => 'Получать информацию об акциях компании Аввита']) ?>
 
     <?= $form->field($model, 'us_getstate', ['options' => ['class' => 'form-group col-md-12'],])->checkbox(['label' => 'Получать информацию об изменении бонусных баллов']) ?>
+
+    <?= $form->field($model, 'isAgree', ['options' => ['class' => 'form-group col-md-12'],])->checkbox(['label' => $model->getAttributeLabel('isAgree')]) ?>
 
     <div class="clearfix"></div>
 

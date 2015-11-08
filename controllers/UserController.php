@@ -63,6 +63,7 @@ class UserController extends Controller
      */
     public function actionRegister()
     {
+        $this->modelScenario = 'register';
         return $this->actionUpdate(0);
     }
 
