@@ -25,12 +25,26 @@ class LoginForm extends Model
         return [
             // username and password are both required
             [['username', 'password'], 'required'],
+            [['username', ], 'email'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
             ['password', 'validatePassword'],
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'username' => 'Email',
+            'password' => 'Пароль',
+            'rememberMe' => 'Запомнить',
+        ];
+    }
+
 
     /**
      * Validates the password.
@@ -45,7 +59,7 @@ class LoginForm extends Model
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect username or password.');
+                $this->addError($attribute, 'Incorrect username or password. ' . Yii::$app->security->generatePasswordHash($this->password));
             }
         }
     }

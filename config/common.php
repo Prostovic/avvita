@@ -3,6 +3,7 @@
 Yii::setAlias('@tests', dirname(__DIR__) . '/tests');
 
 use yii\helpers\ArrayHelper;
+// use app\models\User;
 
 $sfParamLocal = __DIR__ . DIRECTORY_SEPARATOR . 'params-local.php';
 
@@ -24,6 +25,12 @@ return [
             'class' => 'yii\db\Connection',
             'charset' => 'utf8',
         ],
+
+        'authManager' => [
+            'class' => 'yii\rbac\PhpManager',
+            'defaultRoles' => [ 'client', 'operator', 'admin', ],
+        ],
+
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
             'enablePrettyUrl' => true,

@@ -88,7 +88,7 @@ class UserController extends Controller
                 $oNotify->notifyMail('Новый пользователь на портале "' . Yii::$app->name . '"');
             }
             else {
-                Yii::info('Error save: ' . print_r($model->getErrors(), true));
+                Yii::info('Error save User Confirmemail: ' . print_r($model->getErrors(), true));
             }
         }
         return $this->render('confirm_email', ['model' => $model]);

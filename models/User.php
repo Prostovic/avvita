@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use yii\web\IdentityInterface;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\db\Expression;
@@ -38,13 +39,15 @@ use app\components\Notificator;
  * @property integer $us_getnews
  * @property integer $us_getstate
  */
-class User extends ActiveRecord
+class User extends ActiveRecord implements IdentityInterface
 {
     const GROUP_NEWREGISTER = 'newuser';
     const GROUP_CONFIRMED = 'confitmed';
+    const GROUP_CLIENT = 'client';
     const GROUP_BLOCKED = 'blocked';
     const GROUP_OPERATOR = 'operator';
     const GROUP_ADMIN = 'admin';
+
     public $isAgree;
     public $password = '';
 
@@ -71,6 +74,18 @@ class User extends ActiveRecord
                         $model->setPassword($model->password);
                     }
                     return $model->password;
+                },
+            ],
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'us_key',
+                ],
+                'value' => function ($event) {
+                    /** @var \yii\base\Event $event */
+                    $model = $event->sender;
+                    $model->generateAuthKey();
+                    return $model->us_key;
                 },
             ],
             [
@@ -239,4 +254,85 @@ class User extends ActiveRecord
         $sShort = $this->us_name . (empty($this->us_otch) ? '' : (' ' . $this->us_otch));
         return $bShort ? $sShort : ($this->us_fam . ' ' . $sShort);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function findIdentity($id)
+    {
+        return self::findOne($id);
+/*
+        return static::find()
+            ->where([
+                'us_id' => $id,
+                'us_active' => self::STATUS_ACTIVE,
+                'us_group' => [self::GROUP_ADMIN, self::GROUP_OPERATOR, self::GROUP_CLIENT, ],
+            ])
+            ->one();
+*/
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return self::findOne(['us_key' => $token]);
+    }
+
+    /**
+     * Finds user by username
+     *
+     * @param  string      $username
+     * @return static|null
+     */
+    public static function findByUsername($username)
+    {
+        return self::findOne(['us_email' => $username]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getId()
+    {
+        return $this->us_id;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAuthKey()
+    {
+        return $this->us_key;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validateAuthKey($authKey)
+    {
+        return $this->us_key === $authKey;
+    }
+
+    /**
+     * Validates password
+     *
+     * @param  string  $password password to validate
+     * @return boolean if password provided is valid for current user
+     */
+    public function validatePassword($password)
+    {
+//        return $this->password === $password;
+        return Yii::$app->security->validatePassword($password, $this->us_pass);
+    }
+
+    /**
+     * Generates "remember me" authentication key
+     */
+    public function generateAuthKey()
+    {
+        $this->us_key = Yii::$app->security->generateRandomString();
+    }
+
 }

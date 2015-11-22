@@ -1,8 +1,17 @@
 <?php
 
+use app\models\User;
+$aPerm = [
+    User::GROUP_CLIENT,
+    User::GROUP_OPERATOR,
+    User::GROUP_ADMIN,
+    'confirmUser',
+];
 /* @var $this yii\web\View */
 
 $this->title = 'My Yii Application';
+
+
 ?>
 <div class="site-index">
 
@@ -19,6 +28,13 @@ $this->title = 'My Yii Application';
         <div class="row">
             <div class="col-lg-4">
                 <h2>Heading</h2>
+                <?php
+                foreach ($aPerm as $v) {
+                    echo '<p>'.$v.' : '. (Yii::$app->user->can($v) ? '+' : '-') .'</p>';
+                }
+
+
+                ?>
 
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
                     dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
