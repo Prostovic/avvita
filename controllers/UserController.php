@@ -3,13 +3,15 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\User;
-use app\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\widgets\ActiveForm;
 use yii\web\Response;
+
+use app\models\User;
+use app\models\UserSearch;
+use app\components\Notificator;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -65,6 +67,31 @@ class UserController extends Controller
     {
         $this->modelScenario = 'register';
         return $this->actionUpdate(0);
+    }
+
+    /**
+     * Confirm user registration
+     * @return mixed
+     */
+    public function actionConfirmemail($key = '')
+    {
+        $model = User::findOne(['us_confirmkey' => $key]);
+        if( $model !== null ) {
+            $model->us_group = User::GROUP_CONFIRMED;
+            $model->us_confirmkey = '';
+            if( $model->save() ) {
+                $oNotify = new Notificator(
+                    User::findAll(['us_group' => [User::GROUP_ADMIN, User::GROUP_OPERATOR,] ]),
+                    $model,
+                    'newuserreg_mail'
+                );
+                $oNotify->notifyMail('Новый пользователь на портале "' . Yii::$app->name . '"');
+            }
+            else {
+                Yii::info('Error save: ' . print_r($model->getErrors(), true));
+            }
+        }
+        return $this->render('confirm_email', ['model' => $model]);
     }
 
     /**

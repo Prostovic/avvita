@@ -2,13 +2,14 @@
 
 namespace app\models;
 
-use app\components\Notificator;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
-use app\components\ActionBehavior;
 use yii\db\Expression;
+
+use app\components\ActionBehavior;
+use app\components\Notificator;
 
 /**
  * This is the model class for table "{{%user}}".
@@ -40,6 +41,10 @@ use yii\db\Expression;
 class User extends ActiveRecord
 {
     const GROUP_NEWREGISTER = 'newuser';
+    const GROUP_CONFIRMED = 'confitmed';
+    const GROUP_BLOCKED = 'blocked';
+    const GROUP_OPERATOR = 'operator';
+    const GROUP_ADMIN = 'admin';
     public $isAgree;
     public $password = '';
 
@@ -77,7 +82,7 @@ class User extends ActiveRecord
                 'value' => function ($event) {
                     /** @var \yii\base\Event $event */
                     $model = $event->sender;
-                    if( preg_match('|^([\\d]+).([\\d]+).([\\d]+)$|', $model->us_birth, $a) ) {
+                    if( preg_match('|^([\\d]+)\\.([\\d]+)\\.([\\d]+)$|', $model->us_birth, $a) ) {
                         return $a[3] . '-' . $a[2] . '-' . $a[1];
                     }
                     return $model->us_birth;
@@ -133,15 +138,19 @@ class User extends ActiveRecord
     public function rules()
     {
         return [
-            [['us_fam', 'us_name', 'us_email', 'us_adr_post', 'us_birth', 'us_position', 'us_city', 'us_org', 'us_getnews', 'us_getstate', 'isAgree', ], 'required'],
-            [['isAgree', ], 'compare', 'compareValue' => 1, 'message' => 'Необходимо отметить {attribute}'],
+            [['us_fam', 'us_name', 'us_email', 'us_adr_post', 'us_birth', 'us_position', 'us_city', 'us_org', 'us_getnews', 'us_getstate', ], 'required'],
+            [['isAgree', ], 'required', 'on' => ['register']],
+            [['isAgree', ], 'compare', 'compareValue' => 1, 'message' => 'Необходимо отметить {attribute}', 'on' => ['register']],
             [['password', ], 'required', 'on'=>['register']],
             [['us_active', 'us_position', 'us_getnews', 'us_getstate'], 'integer'],
             [['us_birth', 'us_created', 'us_confirm', 'us_activate'], 'safe'],
             [['us_fam', 'us_name', 'us_otch'], 'string', 'max' => 32],
             [['password'], 'string', 'min' => 3],
             [['us_email'], 'string', 'max' => 64],
+            [['us_email'], 'unique', ],
+            [['us_email'], 'email', ],
             [['us_phone'], 'string', 'max' => 24],
+            [['us_phone'], 'match', 'pattern' => '|\\+[\\d]+\\([\\d]+\\)[-\\d]{7,9}|'],
             [['us_adr_post', 'us_pass', 'us_city', 'us_org'], 'string', 'max' => 255],
             [['us_city_id', 'us_org_id', 'us_group'], 'string', 'max' => 16]
         ];
@@ -180,26 +189,26 @@ class User extends ActiveRecord
     }
 
     public function scenarios() {
-        return [
-            'backCreateUser' => [ // регистрирует админ
-            ],
-            'register' => [ // пользователи сами регистрируются
-                'us_fam',
-                'us_name',
-                'us_otch',
-                'us_email',
-                'us_phone',
-                'us_adr_post',
-                'us_birth',
-                'password',
-                'us_position',
-                'us_city',
-                'us_org',
-                'us_getnews',
-                'us_getstate',
-                'isAgree',
-            ],
+        $aRet = parent::scenarios();
+        $aRet['backCreateUser'] = [ // регистрирует админ
         ];
+        $aRet['register'] = [ // пользователи сами регистрируются
+            'us_fam',
+            'us_name',
+            'us_otch',
+            'us_email',
+            'us_phone',
+            'us_adr_post',
+            'us_birth',
+            'password',
+            'us_position',
+            'us_city',
+            'us_org',
+            'us_getnews',
+            'us_getstate',
+            'isAgree',
+        ];
+        return $aRet;
     }
 
     public function getPositions() {
