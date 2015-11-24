@@ -34,9 +34,18 @@ class RbacController extends Controller
         $rule = new \app\rbac\UserGroupRule;
         $auth->add($rule);
 
+        $showGoods = $auth->createPermission('showGoods');
+        $showGoods->description = 'Show goods';
+        $auth->add($showGoods);
+
         $confirmUser = $auth->createPermission('confirmUser');
         $confirmUser->description = 'Confirm user data';
         $auth->add($confirmUser);
+
+        $client = $auth->createRole(User::GROUP_CLIENT);
+        $client->ruleName = $rule->name;
+        $auth->add($client);
+        $auth->addChild($client, $showGoods);
 
         $operator = $auth->createRole(User::GROUP_OPERATOR);
         $operator->ruleName = $rule->name;

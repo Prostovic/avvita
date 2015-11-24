@@ -3,10 +3,12 @@
 namespace app\controllers;
 
 use Yii;
+use yii\base\InvalidCallException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\widgets\ActiveForm;
+use yii\filters\AccessControl;
 use yii\web\Response;
 
 use app\models\User;
@@ -26,6 +28,22 @@ class UserController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['post'],
+                ],
+            ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'confirmemail', 'register', 'testuserdata', ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', 'testuserdata', ],
+                        'roles' => [User::GROUP_OPERATOR],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['confirmemail', 'register', ],
+                        'roles' => ['?', User::GROUP_OPERATOR],
+                    ],
                 ],
             ],
         ];
@@ -75,6 +93,9 @@ class UserController extends Controller
      */
     public function actionConfirmemail($key = '')
     {
+        if( $key == '' ) {
+            throw new InvalidCallException('Не указан ключ');
+        }
         $model = User::findOne(['us_confirmkey' => $key]);
         if( $model !== null ) {
             $model->us_group = User::GROUP_CONFIRMED;
@@ -92,6 +113,28 @@ class UserController extends Controller
             }
         }
         return $this->render('confirm_email', ['model' => $model]);
+    }
+
+    /**
+     * Confirm user registration
+     * @return mixed
+     */
+    public function actionTestuserdata($id)
+    {
+        $model = $this->findModel($id);
+
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->us_id]);
+        } else {
+            return $this->render('testuser', [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**
@@ -155,7 +198,7 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+//        $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
     }
