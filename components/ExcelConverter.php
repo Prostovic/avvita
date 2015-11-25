@@ -73,10 +73,13 @@ class ExcelConverter {
 
 
             $ob = new $sClass;
-            $ob->attributes = [
-                'ord_title' => $sAdr,
-                'ord_phone' => '+7' . $aPh[0],
-            ];
+            foreach($this->fields As $fld => $col) {
+                $ob->{$fld} = trim($oSheet->getCellByColumnAndRow($col, $nRow)->getValue());
+            }
+//            $ob->attributes = [
+//                'ord_title' => $sAdr,
+//                'ord_phone' => '+7' . $aPh[0],
+//            ];
 
             if( $nCou-- > 0 ) {
                 echo iconv('UTF-8', 'CP866', print_r($ob->attributes, true)) . "\n";
