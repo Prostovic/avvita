@@ -63,7 +63,14 @@ class ExcelConverter {
 
         while($nEmpty > 0) {
             $nRow++;
-            $sReg = trim($oSheet->getCellByColumnAndRow($nColReg, $nRow)->getValue());
+
+            $ob = new $sClass;
+
+            $sReg = '';
+            foreach($this->fields As $fld => $col) {
+                $ob->{$fld} = trim($oSheet->getCellByColumnAndRow($col, $nRow)->getValue());
+                $sReg .= $ob->{$fld};
+            }
 
             if( $sReg == '' ) {
                 $nEmpty--;
@@ -71,23 +78,12 @@ class ExcelConverter {
             }
             $nEmpty = 3;
 
-
-            $ob = new $sClass;
-            foreach($this->fields As $fld => $col) {
-                $ob->{$fld} = trim($oSheet->getCellByColumnAndRow($col, $nRow)->getValue());
-            }
-//            $ob->attributes = [
-//                'ord_title' => $sAdr,
-//                'ord_phone' => '+7' . $aPh[0],
-//            ];
-
             if( $nCou-- > 0 ) {
-                echo iconv('UTF-8', 'CP866', print_r($ob->attributes, true)) . "\n";
-//                break;
+                Yii::info('ExcelConverter::read() attributes = ' . print_r($ob->attributes, true));
             }
 
             if( !$ob->save() ) {
-                echo "Error save: " . iconv('UTF-8', 'CP866', print_r($ob->getErrors(), true));
+                Yii::info("ExcelConverter::read() Error save: " . print_r($ob->getErrors(), true));
             }
 //            break;
         }

@@ -6,8 +6,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
+use app\models\FileForm;
 
 class ImportController extends Controller
 {
@@ -38,12 +37,16 @@ class ImportController extends Controller
 
     public function actionCity()
     {
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+        $model = new FileForm();
+        $model->extensions = ['xls', 'xlsx',];
+        $model->maxSize = 500000;
+
+        if( $model->load(Yii::$app->request->post()) && $model->validate() ) {
+            return $this->refresh();
         }
-        return $this->render('login', [
+        return $this->render('fileform', [
             'model' => $model,
+            'title' => 'Загрузка данных по Городам',
         ]);
     }
 
