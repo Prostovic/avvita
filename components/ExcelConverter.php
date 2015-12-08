@@ -8,9 +8,12 @@
 
 namespace app\components;
 
-
+use yii;
 use yii\base\InvalidParamException;
 use \PHPExcel;
+use \PHPExcel_CachedObjectStorageFactory;
+use \PHPExcel_Settings;
+use \PHPExcel_IOFactory;
 
 class ExcelConverter {
     /**
@@ -22,6 +25,13 @@ class ExcelConverter {
     public $fields = [];
 
     /**
+     * @var $keyfields array fields list for search existing values
+     * Массив с полями для поиска существующих данных,
+     * значение - название поля в таблице
+     */
+    public $keyfields = [];
+
+    /**
      * @var $className string ActiveRecord Класс для записи данных
      */
     public $className = null;
@@ -29,7 +39,7 @@ class ExcelConverter {
     /**
      * @var $startRow int первая сртока с данными
      */
-    public $startRow = 1;
+    public $startRow = 0;
 
     /**
      * @var $filePath string Путь к файлу с данными
@@ -52,22 +62,41 @@ class ExcelConverter {
         $cacheMethod = PHPExcel_CachedObjectStorageFactory::cache_to_discISAM;
         PHPExcel_Settings::setCacheStorageMethod($cacheMethod);
 
+        \Yii::info('ExcelConverter:: this->filePath = ' . $this->filePath);
         $objPHPExcel = PHPExcel_IOFactory::load($this->filePath);
 
         $oSheet = $objPHPExcel->getSheet(0);
 
         $nEmpty = 3;
-        $nRow = 0;
+        $nRow = $this->startRow;
         $nCou = 5;
         $sClass = $this->className;
 
         while($nEmpty > 0) {
             $nRow++;
 
-            $ob = new $sClass;
+            $aSearch = [];
+            foreach($this->keyfields As $v) {
+                if( !isset($this->fields[$v]) ) {
+                    throw new InvalidParamException('Not found search field "' . $v . '" in field list ['.implode(', ', array_keys($this->fields)).']');
+                }
+                $aSearch[$v] = trim($oSheet->getCellByColumnAndRow($this->fields[$v], $nRow)->getValue());
+            }
+
+//            Yii::info('aSearch: ' . print_r($aSearch, true));
+
+            $ob = null;
+            if( count($aSearch) > 0 ) {
+                $ob = $sClass::findOne($aSearch);
+//                Yii::info('Find One: ' . print_r($ob->attributes, true));
+            }
+            if( $ob === null ) {
+                $ob = new $sClass;
+            }
 
             $sReg = '';
             foreach($this->fields As $fld => $col) {
+                Yii::info('ExcelConverter::read() ob->'.$fld.' = [' . $nRow . ', ' . $col . '] = ' . trim($oSheet->getCellByColumnAndRow($col, $nRow)->getValue()));
                 $ob->{$fld} = trim($oSheet->getCellByColumnAndRow($col, $nRow)->getValue());
                 $sReg .= $ob->{$fld};
             }
@@ -85,7 +114,7 @@ class ExcelConverter {
             if( !$ob->save() ) {
                 Yii::info("ExcelConverter::read() Error save: " . print_r($ob->getErrors(), true));
             }
-//            break;
+            break;
         }
     }
 

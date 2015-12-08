@@ -3,6 +3,9 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%city}}".
@@ -44,7 +47,7 @@ class City extends \yii\db\ActiveRecord
             [['city_key', 'city_name', ], 'required'],
             [['city_created'], 'safe'],
             [['city_key'], 'string', 'max' => 16],
-            [['city_key'], 'MATCH', 'pattern' => 'l|^[\\d]+$|'],
+            [['city_key'], 'match', 'pattern' => '|^[\\d]+$|'],
             [['city_name'], 'string', 'max' => 32]
         ];
     }

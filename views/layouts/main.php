@@ -55,6 +55,15 @@ AppAsset::register($this);
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
+        <?php
+            $aMsg = ['danger', 'success', 'info', 'warning', ];
+            foreach($aMsg As $v) {
+                if( Yii::$app->session->hasFlash($v) ) {
+                    echo '<div class="alert alert-'.$v.'" role="alert">'.Html::encode(Yii::$app->session->getFlash($v)).'</div>';
+                }
+            }
+//
+        ?>
         <?= $content ?>
     </div>
 </div>

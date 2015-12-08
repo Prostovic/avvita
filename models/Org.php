@@ -3,6 +3,9 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%org}}".
@@ -44,7 +47,7 @@ class Org extends \yii\db\ActiveRecord
             [['org_key', 'org_name', ], 'required'],
             [['org_created'], 'safe'],
             [['org_key'], 'string', 'max' => 16],
-            [['org_key'], 'MATCH', 'pattern' => 'l|^[\\d]+$|'],
+            [['org_key'], 'match', 'pattern' => '|^[\\d]+$|'],
             [['org_name'], 'string', 'max' => 32]
         ];
     }
