@@ -19,11 +19,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'doc_key') ?>
 
-    <?= $form->field($model, 'dac_date') ?>
+    <?= $form->field($model, 'doc_date') ?>
 
     <?= $form->field($model, 'doc_ordernum') ?>
 
-    <?= $form->field($model, 'doc_org_id') ?>
+    <?= $form->field($model, 'doc_fullordernum') ?>
+
+    <?php // echo $form->field($model, 'doc_org_id') ?>
 
     <?php // echo $form->field($model, 'doc_title') ?>
 

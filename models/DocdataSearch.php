@@ -19,7 +19,7 @@ class DocdataSearch extends Docdata
     {
         return [
             [['doc_id', 'doc_org_id', 'doc_number'], 'integer'],
-            [['doc_key', 'dac_date', 'doc_ordernum', 'doc_title', 'doc_created'], 'safe'],
+            [['doc_key', 'doc_date', 'doc_ordernum', 'doc_fullordernum', 'doc_title', 'doc_created'], 'safe'],
             [['doc_summ'], 'number'],
         ];
     }
@@ -58,7 +58,7 @@ class DocdataSearch extends Docdata
 
         $query->andFilterWhere([
             'doc_id' => $this->doc_id,
-            'dac_date' => $this->dac_date,
+            'doc_date' => $this->doc_date,
             'doc_org_id' => $this->doc_org_id,
             'doc_number' => $this->doc_number,
             'doc_summ' => $this->doc_summ,
@@ -67,6 +67,7 @@ class DocdataSearch extends Docdata
 
         $query->andFilterWhere(['like', 'doc_key', $this->doc_key])
             ->andFilterWhere(['like', 'doc_ordernum', $this->doc_ordernum])
+            ->andFilterWhere(['like', 'doc_fullordernum', $this->doc_fullordernum])
             ->andFilterWhere(['like', 'doc_title', $this->doc_title]);
 
         return $dataProvider;

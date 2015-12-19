@@ -14,9 +14,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'doc_key')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'dac_date')->textInput() ?>
+    <?= $form->field($model, 'doc_date')->textInput() ?>
 
     <?= $form->field($model, 'doc_ordernum')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'doc_fullordernum')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'doc_org_id')->textInput() ?>
 

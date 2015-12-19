@@ -27,9 +27,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'doc_id',
             'doc_key',
-            'dac_date',
+            'doc_date',
             'doc_ordernum',
-            'doc_org_id',
+            'doc_fullordernum',
+            // 'doc_org_id',
             // 'doc_title',
             // 'doc_number',
             // 'doc_summ',

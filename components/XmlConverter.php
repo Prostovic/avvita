@@ -69,6 +69,8 @@ class XmlConverter {
         if ( $this->xsl == null) {
             throw new InvalidParamException('Нужно указать таблицу стилей для преобразования');
         }
+
+        $sClass = $this->className;
 /*
         $xslt = new XSLTProcessor();
         $xsl = new DOMDocument();
@@ -116,6 +118,22 @@ class XmlConverter {
                         // в этом месте мы уже имеем сформированный массив и можем передать его на какую либо обработку
                         $nEl++;
                         Yii::info('Element ' . $nEl . ' : ' . print_r($item, true));
+
+                        $aSearch = [
+                            'doc_key' => $item['__attribs']['НомерДокумента'],
+                        ];
+                        $ob = $sClass::findOne($aSearch);
+                        if( $ob === null ) {
+                            $ob = new $sClass;
+                        }
+                        foreach($this->fields As $k=>$v) {
+                            $ob->$k = $item['__attribs'][$v];
+                        }
+                        if( !$ob->save() ) {
+                            Yii::warning('Error save data ' . print_r($item, true) . "\n" . print_r($ob->getErrors(), true));
+                            Yii::$app->session->setFlash('danger', $ob->getErrors());
+                            break;
+                        }
                     }
             }
         }

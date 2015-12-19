@@ -13,7 +13,7 @@ use app\components\XmlConverter;
 
 use app\models\City;
 use app\models\Org;
-
+use app\models\Docdata;
 
 class ImportController extends Controller
 {
@@ -129,7 +129,7 @@ class ImportController extends Controller
                 $oFile->saveAs($sf);
                 Yii::info('File: ' . $sf . ' ' . (file_exists($sf) ? ' OK' : ' FAIL'));
                 $oConverter = new XmlConverter();
-                $oConverter->className = Org::className();
+                $oConverter->className = Docdata::className();
                 $oConverter->filePath = $sf;
                 $oConverter->xsl = <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>
@@ -148,10 +148,16 @@ class ImportController extends Controller
 EOT;
 
                 $oConverter->fields = [
-                    'org_key' => 1,
-                    'org_name' => 2,
+                    'doc_key' => 'НомерДокумента',
+                    'doc_date' => 'ДатаДокумента',
+                    'doc_fullordernum' => 'ПолныйНомерЗаказа',
+                    'doc_ordernum' => 'НомерЗаказа',
+                    'doc_org_id' => 'КодКонтрагента',
+                    'doc_title' => 'НоменклатураХарактеристика',
+                    'doc_number' => 'Количество',
+                    'doc_summ' => 'Сумма',
                 ];
-                $oConverter->keyfields = ['org_key', ];
+                $oConverter->keyfields = ['doc_key', ];
 //            Yii::info('File: ' . $sf);
                 $oConverter->read();
                 unlink($sf);

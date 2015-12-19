@@ -11,8 +11,9 @@ class m151209_151225_add_document_table extends BaseMigration
         $this->createTable('{{%docdata}}', [
             'doc_id' => Schema::TYPE_PK,
             'doc_key' => Schema::TYPE_STRING . '(16) Not Null Comment \'Номер\'',
-            'dac_date' => Schema::TYPE_DATETIME . ' Not Null Comment \'Дата\'',
-            'doc_ordernum' => Schema::TYPE_STRING . '(32) Not Null Comment \'Заказ\'',
+            'doc_date' => Schema::TYPE_DATETIME . ' Not Null Comment \'Дата\'',
+            'doc_ordernum' => Schema::TYPE_STRING . '(32) Not Null Comment \'Номер заказа\'',
+            'doc_fullordernum' => Schema::TYPE_STRING . '(32) Not Null Comment \'Полный номер заказа\'',
             'doc_org_id' => Schema::TYPE_INTEGER . ' Not Null Comment \'Организация\'',
             'doc_title' => Schema::TYPE_STRING . '(255) Not Null Comment \'Нименование\'',
             'doc_number' => Schema::TYPE_INTEGER . ' Not Null Comment \'Кол-во\'',
@@ -23,7 +24,7 @@ class m151209_151225_add_document_table extends BaseMigration
         $this->createIndex('idx_doc_key', '{{%docdata}}', 'doc_key');
         $this->createIndex('idx_doc_org_id', '{{%docdata}}', 'doc_org_id');
         $this->createIndex('idx_doc_ordernum', '{{%docdata}}', 'doc_ordernum');
-        $this->createIndex('idx_dac_date', '{{%docdata}}', 'dac_date');
+        $this->createIndex('idx_doc_date', '{{%docdata}}', 'doc_date');
 
         $this->refreshCache();
     }

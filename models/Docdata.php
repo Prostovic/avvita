@@ -3,14 +3,18 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%docdata}}".
  *
  * @property integer $doc_id
  * @property string $doc_key
- * @property string $dac_date
+ * @property string $doc_date
  * @property string $doc_ordernum
+ * @property string $doc_fullordernum
  * @property integer $doc_org_id
  * @property string $doc_title
  * @property integer $doc_number
@@ -19,6 +23,20 @@ use Yii;
  */
 class Docdata extends \yii\db\ActiveRecord
 {
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['doc_created'],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -33,12 +51,13 @@ class Docdata extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['doc_key', 'dac_date', 'doc_ordernum', 'doc_org_id', 'doc_title', 'doc_number', 'doc_summ', 'doc_created'], 'required'],
-            [['dac_date', 'doc_created'], 'safe'],
+            [['doc_key', 'doc_ordernum', 'doc_fullordernum', 'doc_org_id', 'doc_title', 'doc_number', 'doc_summ', ], 'required'],
+            [['doc_date', 'doc_created'], 'filter', 'filter' => function($val) { $newVal = trim($val); if( preg_match('|([\\d]{1,2})\.([\\d]{1,2})\.([\\d]{4})|', $newVal, $a) ) { $newVal = $a[3] . '-' . $a[2] . '-' . $a[1]; } return $newVal; }],
+//            [['doc_date', 'doc_created'], 'safe'],
             [['doc_org_id', 'doc_number'], 'integer'],
             [['doc_summ'], 'number'],
             [['doc_key'], 'string', 'max' => 16],
-            [['doc_ordernum'], 'string', 'max' => 32],
+            [['doc_ordernum', 'doc_fullordernum'], 'string', 'max' => 32],
             [['doc_title'], 'string', 'max' => 255]
         ];
     }
@@ -51,8 +70,9 @@ class Docdata extends \yii\db\ActiveRecord
         return [
             'doc_id' => 'Doc ID',
             'doc_key' => 'Номер',
-            'dac_date' => 'Дата',
-            'doc_ordernum' => 'Заказ',
+            'doc_date' => 'Дата',
+            'doc_ordernum' => 'Номер заказа',
+            'doc_fullordernum' => 'Полный номер заказа',
             'doc_org_id' => 'Организация',
             'doc_title' => 'Нименование',
             'doc_number' => 'Кол-во',
