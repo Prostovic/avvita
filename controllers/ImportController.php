@@ -159,8 +159,11 @@ EOT;
                 ];
                 $oConverter->keyfields = ['doc_key', ];
 //            Yii::info('File: ' . $sf);
-                $oConverter->read();
+                $bOk = $oConverter->read();
                 unlink($sf);
+                if( $bOk ) {
+                    Yii::$app->session->setFlash('success', 'Данные импортированы');
+                }
             }
             else {
                 Yii::$app->session->setFlash('danger', 'Error validate file: ' . print_r($model->getErrors(), true));

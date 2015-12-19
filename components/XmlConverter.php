@@ -91,6 +91,7 @@ class XmlConverter {
         $reader->open($this->filePath);
         $item = array();
         $nEl = 0;
+        $bOk = true;
         while ($reader->read()) {
             switch ($reader->nodeType) {
                 case (XMLReader::ELEMENT):
@@ -121,6 +122,7 @@ class XmlConverter {
 
                         $aSearch = [
                             'doc_key' => $item['__attribs']['НомерДокумента'],
+                            'doc_title' => $item['__attribs']['НоменклатураХарактеристика'],
                         ];
                         $ob = $sClass::findOne($aSearch);
                         if( $ob === null ) {
@@ -132,11 +134,13 @@ class XmlConverter {
                         if( !$ob->save() ) {
                             Yii::warning('Error save data ' . print_r($item, true) . "\n" . print_r($ob->getErrors(), true));
                             Yii::$app->session->setFlash('danger', $ob->getErrors());
+                            $bOk = false;
                             break;
                         }
                     }
             }
         }
+        return $bOk;
     }
 
 }
