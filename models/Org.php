@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%org}}".
@@ -64,4 +65,9 @@ class Org extends \yii\db\ActiveRecord
             'org_created' => Yii::t('app', 'Создан'),
         ];
     }
+
+    public static function getCities() {
+        return ArrayHelper::map(self::find()->orderBy('org_name')->all(), 'org_id', 'org_name');
+    }
+
 }

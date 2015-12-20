@@ -19,6 +19,7 @@ class UserSearch extends User
     {
         return [
             [['us_id', 'us_active', 'us_position', 'us_getnews', 'us_getstate'], 'integer'],
+            [['us_group'], 'in', 'range' => array_keys(self::getGroups()), ],
             [['us_fam', 'us_name', 'us_otch', 'us_email', 'us_phone', 'us_adr_post', 'us_birth', 'us_pass', 'us_city', 'us_org', 'us_city_id', 'us_org_id', 'us_created', 'us_confirm', 'us_activate'], 'safe'],
         ];
     }
@@ -77,6 +78,7 @@ class UserSearch extends User
             ->andFilterWhere(['like', 'us_city', $this->us_city])
             ->andFilterWhere(['like', 'us_org', $this->us_org])
             ->andFilterWhere(['like', 'us_city_id', $this->us_city_id])
+            ->andFilterWhere(['=', 'us_group', $this->us_group])
             ->andFilterWhere(['like', 'us_org_id', $this->us_org_id]);
 
         return $dataProvider;

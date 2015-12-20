@@ -51,8 +51,8 @@ class ImportController extends Controller
         if( $model->load(Yii::$app->request->post()) ) {
             if( $model->validate() ) {
                 $oFile = UploadedFile::getInstance($model, 'filename');
-//            $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . time() . '-tmp.' . $oFile->extension; // $oFile->baseName .
-                $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . 'tmp.' . $oFile->extension; // $oFile->baseName .
+                $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . time() . '-tmp.' . $oFile->extension; // $oFile->baseName .
+//                $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . 'tmp.' . $oFile->extension; // $oFile->baseName .
                 $oFile->saveAs($sf);
                 Yii::info('File: ' . $sf . ' ' . (file_exists($sf) ? ' OK' : ' FAIL'));
                 $oConverter = new ExcelConverter();
@@ -67,6 +67,7 @@ class ImportController extends Controller
 //            Yii::info('File: ' . $sf);
                 $oConverter->read();
                 unlink($sf);
+                Yii::$app->session->setFlash('success', 'Данные импортированы');
             }
             else {
                 Yii::$app->session->setFlash('danger', 'Error validate file: ' . print_r($model->getErrors(), true));
@@ -88,8 +89,8 @@ class ImportController extends Controller
         if( $model->load(Yii::$app->request->post()) ) {
             if( $model->validate() ) {
                 $oFile = UploadedFile::getInstance($model, 'filename');
-//            $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . time() . '-tmp.' . $oFile->extension; // $oFile->baseName .
-                $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . 'tmp.' . $oFile->extension; // $oFile->baseName .
+                $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . time() . '-tmp.' . $oFile->extension; // $oFile->baseName .
+//                $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . 'tmp.' . $oFile->extension; // $oFile->baseName .
                 $oFile->saveAs($sf);
                 Yii::info('File: ' . $sf . ' ' . (file_exists($sf) ? ' OK' : ' FAIL'));
                 $oConverter = new ExcelConverter();
@@ -104,6 +105,7 @@ class ImportController extends Controller
 //            Yii::info('File: ' . $sf);
                 $oConverter->read();
                 unlink($sf);
+                Yii::$app->session->setFlash('success', 'Данные импортированы');
             }
             else {
                 Yii::$app->session->setFlash('danger', 'Error validate file: ' . print_r($model->getErrors(), true));
@@ -124,8 +126,8 @@ class ImportController extends Controller
         if( $model->load(Yii::$app->request->post()) ) {
             if( $model->validate() ) {
                 $oFile = UploadedFile::getInstance($model, 'filename');
-//            $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . time() . '-tmp.' . $oFile->extension; // $oFile->baseName .
-                $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . 'tmp.' . $oFile->extension; // $oFile->baseName .
+            $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . time() . '-tmp.' . $oFile->extension; // $oFile->baseName .
+//                $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . 'tmp.' . $oFile->extension; // $oFile->baseName .
                 $oFile->saveAs($sf);
                 Yii::info('File: ' . $sf . ' ' . (file_exists($sf) ? ' OK' : ' FAIL'));
                 $oConverter = new XmlConverter();

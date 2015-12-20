@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use app\models\User;
 
 /**
  * LoginForm is the model behind the login form.
@@ -59,7 +60,18 @@ class LoginForm extends Model
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect username or password. ' . Yii::$app->security->generatePasswordHash($this->password));
+                $this->addError($attribute, 'Неправильное имя пользователя или пароль.'); //  . Yii::$app->security->generatePasswordHash($this->password)
+            }
+            else {
+                if( $user->us_group == User::GROUP_NEWREGISTER ) {
+                    $this->addError($attribute, 'Вы не прошли проверку электрноой почты. Пройдите по ссылке в письме на Ваш адрес.');
+                }
+                if( $user->us_group == User::GROUP_CONFIRMED ) {
+                    $this->addError($attribute, 'До проверки администраторм Вы не можете пользоваться сайтом.');
+                }
+                if( $user->us_group == User::GROUP_BLOCKED ) {
+                    $this->addError($attribute, 'Вы не можете пользоваться данным сайтом.');
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use app\models\User;
 
 AppAsset::register($this);
 ?>
@@ -26,6 +27,15 @@ AppAsset::register($this);
 
 <div class="wrap">
     <?php
+    $sMenuName = 'guest';
+    if( !Yii::$app->user->isGuest ) {
+        if( Yii::$app->user->can(User::GROUP_ADMIN) || Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+            $sMenuName = 'operator';
+        }
+    }
+
+    echo $this->render('//layouts/' . $sMenuName . '_menu', []);
+/*
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
@@ -49,6 +59,7 @@ AppAsset::register($this);
         ],
     ]);
     NavBar::end();
+*/
     ?>
 
     <div class="container">

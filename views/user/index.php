@@ -4,6 +4,8 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\grid\DataColumn;
 
+use app\models\User;
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -26,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
 //            ['class' => 'yii\grid\SerialColumn'],
 
-            'us_id',
+//            'us_id',
 //            'us_active',
             [
                 'class' => DataColumn::className(),
@@ -39,6 +41,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'us_email',
                 'format' => 'raw',
                 'value' => function($model, $key, $index, $column) { return $model->us_email . '<br />' . $model->us_phone; },
+            ],
+            [
+                'class' => DataColumn::className(),
+                'attribute' => 'us_group',
+                'format' => 'raw',
+                'value' => function($model, $key, $index, $column) { return $model->groupName; },
+                'filter' => User::getGroups(),
             ],
             [
                 'class' => DataColumn::className(),
@@ -71,12 +80,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'buttons' => [
                     'confirm' => function ($url, $model, $key) {
                         return $model->us_group == \app\models\User::GROUP_NEWREGISTER ?
-                            Html::a('<span class="glyphicon glyphicon-ok"></span>', ['user/confirmemail', 'key' => $model->us_confirmkey]) :
+                            Html::a('<span class="glyphicon glyphicon-ok"></span>', ['user/confirmemail', 'key' => $model->us_confirmkey], ['title' => 'Подтвердить Email']) :
                             '';
                     },
                     'testudata' => function ($url, $model, $key) {
                         return $model->us_group == \app\models\User::GROUP_CONFIRMED ?
-                            Html::a('<span class="glyphicon glyphicon-tag"></span>', ['user/testuserdata', 'id' => $model->us_id]) :
+                            Html::a('<span class="glyphicon glyphicon-tag"></span>', ['user/testuserdata', 'id' => $model->us_id], ['title' => 'Проверить данные']) :
                             '';
                     },
                 ]

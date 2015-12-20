@@ -23,6 +23,9 @@ use yii\helpers\Html;
         сможете пополнять свои баллы и получать подарки на портале.
     </div>
         <?php
+        if( $model->hasErrors() ) {
+            echo nl2br(print_r($model->getErrors(), true));
+        }
     }
     ?>
 

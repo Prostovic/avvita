@@ -64,6 +64,25 @@ class User extends ActiveRecord implements IdentityInterface
             [
                 'class' => AttributeBehavior::className(),
                 'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['us_activate'],
+                ],
+                'value' => function ($event) {
+                    /** @var  $model User */
+                    $model = $event->sender;
+                    if( ($model->us_group == User::GROUP_CLIENT) && ($model->us_activate === null) ) {
+                        $oRet = new Expression('NOW()');
+                        $oNotify = new Notificator([$model], $model, 'activate_mail');
+                        $oNotify->notifyMail('Вы проверены на портале "' . Yii::$app->name . '"');
+                    }
+                    else {
+                        $oRet = $model->us_activate;
+                    }
+                    return $oRet;
+                },
+            ],
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => 'password',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'password',
                 ],
@@ -153,21 +172,23 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['us_fam', 'us_name', 'us_email', 'us_adr_post', 'us_birth', 'us_position', 'us_city', 'us_org', 'us_getnews', 'us_getstate', ], 'required'],
+            [['us_fam', 'us_name', 'us_email', 'us_adr_post', 'us_birth', 'us_position', 'us_city', 'us_org', 'us_getnews', 'us_getstate', 'us_city_id', 'us_org_id', ], 'required'],
+            [['us_fam', 'us_name', 'us_otch', 'us_city', ], 'app\components\CapitalizeFilter'],
             [['isAgree', ], 'required', 'on' => ['register']],
             [['isAgree', ], 'compare', 'compareValue' => 1, 'message' => 'Необходимо отметить {attribute}', 'on' => ['register']],
             [['password', ], 'required', 'on'=>['register']],
-            [['us_active', 'us_position', 'us_getnews', 'us_getstate'], 'integer'],
+            [['us_active', 'us_position', 'us_getnews', 'us_getstate', 'us_city_id', 'us_org_id', ], 'integer'],
             [['us_birth', 'us_created', 'us_confirm', 'us_activate'], 'safe'],
             [['us_fam', 'us_name', 'us_otch'], 'string', 'max' => 32],
             [['password'], 'string', 'min' => 3],
             [['us_email'], 'string', 'max' => 64],
             [['us_email'], 'unique', ],
             [['us_email'], 'email', ],
+            [['us_group'], 'in', 'range' => array_keys(self::getGroups()), ],
             [['us_phone'], 'string', 'max' => 24],
             [['us_phone'], 'match', 'pattern' => '|\\+[\\d]+\\([\\d]+\\)[-\\d]{7,9}|'],
             [['us_adr_post', 'us_pass', 'us_city', 'us_org'], 'string', 'max' => 255],
-            [['us_city_id', 'us_org_id', 'us_group'], 'string', 'max' => 16]
+            [['us_group'], 'string', 'max' => 16]
         ];
     }
 
@@ -223,6 +244,28 @@ class User extends ActiveRecord implements IdentityInterface
             'us_getstate',
             'isAgree',
         ];
+
+        $aRet['confirmUserEmail'] = [ // проверка email
+            'us_group',
+        ];
+
+        $aRet['testUserData'] = [ // проверка пользователя админом
+            'us_fam',
+            'us_name',
+            'us_otch',
+            'us_email',
+            'us_phone',
+            'us_adr_post',
+            'us_birth',
+            'password',
+            'us_position',
+            'us_city',
+            'us_org',
+            'us_city_id',
+            'us_org_id',
+            'us_group',
+        ];
+
         return $aRet;
     }
 
@@ -233,6 +276,22 @@ class User extends ActiveRecord implements IdentityInterface
             3 => 'Продавец-консультант',
             4 => 'Другое',
         ];
+    }
+
+    public static function getGroups($group = null) {
+        $a = [
+            self::GROUP_NEWREGISTER => 'Неподтвержден',
+            self::GROUP_CONFIRMED => 'Непроверен',
+            self::GROUP_CLIENT => 'Активен',
+            self::GROUP_BLOCKED => 'Заблокирован',
+            self::GROUP_OPERATOR => 'Оператор',
+            self::GROUP_ADMIN => 'Админ',
+        ];
+        return ( $group === null ) ? $a : (isset($a[$group]) ? $a[$group] : null);
+    }
+
+    public function getGroupName() {
+        return self::getGroups($this->us_group);
     }
 
     /**

@@ -114,7 +114,7 @@ class ExcelConverter {
             if( !$ob->save() ) {
                 Yii::info("ExcelConverter::read() Error save: " . print_r($ob->getErrors(), true));
             }
-            break;
+//            break;
         }
     }
 

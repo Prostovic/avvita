@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\base\InvalidCallException;
+use yii\db\Expression;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -21,6 +22,7 @@ use app\components\Notificator;
 class UserController extends Controller
 {
     public $modelScenario = 'register';
+    public $redirectAfterUpdate = null;
     public function behaviors()
     {
         return [
@@ -97,9 +99,13 @@ class UserController extends Controller
             throw new InvalidCallException('Не указан ключ');
         }
         $model = User::findOne(['us_confirmkey' => $key]);
+        /** @var $model User */
         if( $model !== null ) {
             $model->us_group = User::GROUP_CONFIRMED;
             $model->us_confirmkey = '';
+            $model->us_confirm = new Expression('NOW()');
+            $model->scenario = 'confirmUserEmail';
+
             if( $model->save() ) {
                 $oNotify = new Notificator(
                     User::findAll(['us_group' => [User::GROUP_ADMIN, User::GROUP_OPERATOR,] ]),
@@ -122,6 +128,7 @@ class UserController extends Controller
     public function actionTestuserdata($id)
     {
         $model = $this->findModel($id);
+        $this->modelScenario = 'testUserData';
 
         if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -167,10 +174,12 @@ class UserController extends Controller
      */
     public function actionUpdate($id)
     {
+        $bNew = false;
         if( $id == 0 ) {
             $model = new User();
             $model->scenario = $this->modelScenario;
             $model->loadDefaultValues();
+            $bNew = true;
         }
         else {
             $model = $this->findModel($id);
@@ -182,7 +191,14 @@ class UserController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->us_id]);
+            if( $bNew && ($this->modelScenario == 'register') ) {
+                return $this->render('register_thankyou', [
+                    'model' => $model,
+                ]);
+            }
+            else {
+                return $this->redirect(['view', 'id' => $model->us_id]);
+            }
         } else {
             return $this->render('update', [
                 'model' => $model,
