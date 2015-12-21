@@ -7,6 +7,8 @@ use app\models\City;
 use app\models\Org;
 use app\models\User;
 
+use kartik\select2\Select2;
+
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 /* @var $form yii\widgets\ActiveForm */
@@ -82,9 +84,25 @@ $model->us_group = User::GROUP_CLIENT;
 
     <div class="clearfix"></div>
 
-    <?= $form->field($model, 'us_city_id')->dropDownList(City::getCities(), ['placeholder' => $model->getAttributeLabel('')]) ?>
+    <?= '' // $form->field($model, 'us_city_id')->dropDownList(City::getCities(), ['placeholder' => $model->getAttributeLabel('us_city_id')]) ?>
+    <?= $form->field($model, 'us_city_id')->widget(Select2::classname(), [
+        'data' => City::getCities(),
+        'language' => 'ru',
+        'options' => ['placeholder' => $model->getAttributeLabel('us_city_id')],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+    ])  ?>
 
-    <?= $form->field($model, 'us_org_id')->dropDownList(Org::getCities(), ['placeholder' => $model->getAttributeLabel('')]) ?>
+    <?= '' // $form->field($model, 'us_org_id')->dropDownList(Org::getCities(), ['placeholder' => $model->getAttributeLabel('')]) ?>
+    <?= $form->field($model, 'us_org_id')->widget(Select2::classname(), [
+        'data' => Org::getCities(),
+        'language' => 'ru',
+        'options' => ['placeholder' => $model->getAttributeLabel('us_org_id')],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+    ]) ?>
 
     <div class="clearfix"></div>
 
