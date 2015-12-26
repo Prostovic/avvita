@@ -19,7 +19,7 @@ class UserGroupRule extends Rule {
     public function execute($user, $item, $params) {
         if (!Yii::$app->user->isGuest) {
             $group = Yii::$app->user->identity->us_group;
-            Yii::info('execute() user = ' . print_r($user, true) . "\nitem = " . print_r($item, true) . "\nparams = " . print_r($params, true));
+//            Yii::info('execute() user = ' . print_r($user, true) . "\nitem = " . print_r($item, true) . "\nparams = " . print_r($params, true));
             if( $item->name === User::GROUP_ADMIN ) {
                 return $group == User::GROUP_ADMIN;
             }

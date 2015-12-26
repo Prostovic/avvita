@@ -66,8 +66,18 @@ class Org extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function getCities() {
-        return ArrayHelper::map(self::find()->orderBy('org_name')->all(), 'org_id', 'org_name');
+    /**
+     * @return array
+     */
+    public static function getList() {
+        return ArrayHelper::map(self::getOrgList(), 'org_id', 'org_name');
+    }
+
+    /**
+     * @return array
+     */
+    public static function getOrgList() {
+        return self::find()->orderBy('org_name')->all();
     }
 
 }

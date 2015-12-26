@@ -7,7 +7,7 @@ $this->title = isset($title) ? $title : 'Загрузка из файла';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="import-city">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <!-- h1><?= '' // Html::encode($this->title) ?></h1 -->
 
     <?php $form = ActiveForm::begin([
         'id' => 'file-form',

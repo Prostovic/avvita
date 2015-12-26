@@ -174,7 +174,7 @@ EOT;
         }
         return $this->render('fileform', [
             'model' => $model,
-            'title' => 'Загрузка данных',
+            'title' => 'Импорт xml по заказам',
         ]);
     }
 

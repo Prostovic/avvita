@@ -44,6 +44,10 @@ class DocdataSearch extends Docdata
     {
         $query = Docdata::find();
 
+        $query->with([
+            'org'
+        ]);
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);

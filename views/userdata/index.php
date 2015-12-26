@@ -13,6 +13,8 @@ use app\models\User;
 $this->title = 'Заказы';
 $this->params['breadcrumbs'][] = $this->title;
 
+$bOperator = Yii::$app->user->can(User::GROUP_OPERATOR);
+
 $columns = [
 //            ['class' => 'yii\grid\SerialColumn'],
 //
@@ -31,7 +33,7 @@ $columns = [
 
 ];
 
-if( Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+if( $bOperator ) {
     $columns[] = [
         'class' => 'yii\grid\DataColumn',
         'attribute' => 'ud_us_id',
@@ -42,16 +44,28 @@ if( Yii::$app->user->can(User::GROUP_OPERATOR) ) {
     ];
 }
 
+$columns[] = [
+    'class' => 'yii\grid\DataColumn',
+    'attribute' => 'docsumm',
+    'filter' => false,
+    'value' => function ($model, $key, $index, $column) {
+        return array_reduce($model->docs, function($res, $ob){ return $res + $ob->doc_summ; }, 0);
+    }
+];
+
 $columns[] = ['class' => 'yii\grid\ActionColumn'];
+
 ?>
 <div class="userdata-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <!-- h1><?= '' // Html::encode($this->title) ?></h1 -->
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
+    <?php if( !$bOperator ) { ?>
     <p>
         <?= Html::a('Добавить заказ', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
+    <?php } ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,

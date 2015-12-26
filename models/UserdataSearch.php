@@ -44,6 +44,11 @@ class UserdataSearch extends Userdata
     {
         $query = Userdata::find();
 
+        $query->with([
+            'docs',
+            'user'
+        ]);
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);

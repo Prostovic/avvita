@@ -66,6 +66,9 @@ class City extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function getCities() {
         return ArrayHelper::map(self::find()->orderBy('city_name')->all(), 'city_id', 'city_name');
     }

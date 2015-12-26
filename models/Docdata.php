@@ -7,6 +7,8 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\db\ActiveRecord;
 
+use app\models\Org;
+
 /**
  * This is the model class for table "{{%docdata}}".
  *
@@ -79,5 +81,12 @@ class Docdata extends \yii\db\ActiveRecord
             'doc_summ' => 'Сумма',
             'doc_created' => 'Создан',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrg() {
+        return $this->hasOne(Org::className(), ['org_key' => 'doc_org_id']);
     }
 }

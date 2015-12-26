@@ -96,7 +96,7 @@ $model->us_group = User::GROUP_CLIENT;
 
     <?= '' // $form->field($model, 'us_org_id')->dropDownList(Org::getCities(), ['placeholder' => $model->getAttributeLabel('')]) ?>
     <?= $form->field($model, 'us_org_id')->widget(Select2::classname(), [
-        'data' => Org::getCities(),
+        'data' => Org::getList(),
         'language' => 'ru',
         'options' => ['placeholder' => $model->getAttributeLabel('us_org_id')],
         'pluginOptions' => [
