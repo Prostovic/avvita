@@ -3,17 +3,24 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\User;
 use app\models\Userdata;
 use app\models\UserdataSearch;
+use app\models\OrderForm;
+
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use yii\widgets\ActiveForm;
+use yii\web\Response;
 
 /**
  * UserdataController implements the CRUD actions for Userdata model.
  */
 class UserdataController extends Controller
 {
+
     public function behaviors()
     {
         return [
@@ -21,6 +28,27 @@ class UserdataController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['post'],
+                ],
+            ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'create', 'delete', ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', ],
+                        'roles' => [User::GROUP_OPERATOR, User::GROUP_CLIENT, ],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create', 'view', ],
+                        'roles' => [User::GROUP_CLIENT, ],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete', ],
+                        'roles' => [User::GROUP_OPERATOR, ],
+                    ],
                 ],
             ],
         ];
@@ -60,12 +88,17 @@ class UserdataController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Userdata();
+        $model = new OrderForm();
+
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->ud_id]);
+            return $this->redirect(['index', ]);
         } else {
-            return $this->render('create', [
+            return $this->render('append', [
                 'model' => $model,
             ]);
         }

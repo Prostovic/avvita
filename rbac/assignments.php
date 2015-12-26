@@ -1,2 +1,6 @@
 <?php
-return [];
+return [
+    11 => [
+        'client',
+    ],
+];

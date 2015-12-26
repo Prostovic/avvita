@@ -32,6 +32,9 @@ AppAsset::register($this);
         if( Yii::$app->user->can(User::GROUP_ADMIN) || Yii::$app->user->can(User::GROUP_OPERATOR) ) {
             $sMenuName = 'operator';
         }
+        elseif( Yii::$app->user->can(User::GROUP_CLIENT) ) {
+            $sMenuName = 'client';
+        }
     }
 
     echo $this->render('//layouts/' . $sMenuName . '_menu', []);
