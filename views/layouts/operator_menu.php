@@ -27,7 +27,7 @@ echo Nav::widget([
                 '<li class="dropdown-header">Все пользователи системы</li>',
                 '<li class="divider"></li>',
                 ['label' => 'Непроверенные', 'url' => ['user/index', 'UserSearch[us_group]' => 'confitmed', ]],
-                '<li class="dropdown-header">Excel файл</li>',
+                '<li class="dropdown-header">Непрверенные пользователи</li>',
 //                '<li class="divider"></li>',
 //                ['label' => 'Заказы', 'url' => ['import/data']],
 //                '<li class="dropdown-header">XML файл</li>',
