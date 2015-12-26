@@ -394,4 +394,17 @@ class User extends ActiveRecord implements IdentityInterface
         $this->us_key = Yii::$app->security->generateRandomString();
     }
 
+    /**
+     * Список пользователей оределенной группы или групп
+     * @param string|array $sType
+     * @return array
+     */
+    public static function getUserList($sType = self::GROUP_CLIENT) {
+        static $aGroups = [];
+        $sKey = is_array($sType) ? implode('_', asort($sType)) : $sType;
+        if( !isset($aGroups[$sKey]) ) {
+            $aGroups[$sKey] = self::find()->where(['us_group' => $sType])->all();
+        }
+        return $aGroups[$sKey];
+    }
 }

@@ -19,6 +19,7 @@ class UserdataSearch extends Userdata
     {
         return [
             [['ud_id', 'ud_doc_id', 'ud_us_id'], 'integer'],
+            [['ud_doc_key'], 'string'],
             [['ud_created'], 'safe'],
         ];
     }
@@ -49,6 +50,11 @@ class UserdataSearch extends Userdata
 
         $this->load($params);
 
+        $oUser = Yii::$app->user;
+        if( !$oUser->can(User::GROUP_ADMIN) && !$oUser->can(User::GROUP_OPERATOR) ) {
+            $this->ud_us_id = $oUser->identity->us_id;
+        }
+
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
@@ -61,6 +67,9 @@ class UserdataSearch extends Userdata
             'ud_us_id' => $this->ud_us_id,
             'ud_created' => $this->ud_created,
         ]);
+
+        $query->andFilterWhere(['like', 'ud_doc_key', $this->ud_doc_key]);
+
 
         return $dataProvider;
     }
