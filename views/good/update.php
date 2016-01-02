@@ -6,13 +6,11 @@ use yii\helpers\Html;
 /* @var $model app\models\Good */
 
 $this->title = 'Update Good: ' . ' ' . $model->gd_id;
-$this->params['breadcrumbs'][] = ['label' => 'Goods', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->gd_id, 'url' => ['view', 'id' => $model->gd_id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->title = 'Изменение подарка' . ' ' . $model->gd_title;
+$this->params['breadcrumbs'][] = ['label' => 'Подарки', 'url' => ['list']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="good-update">
-
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
         'model' => $model,

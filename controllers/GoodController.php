@@ -8,6 +8,12 @@ use app\models\GoodSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
+use yii\helpers\Url;
+
+use app\models\User;
 
 /**
  * GoodController implements the CRUD actions for Good model.
@@ -23,7 +29,38 @@ class GoodController extends Controller
                     'delete' => ['post'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'list', ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', ],
+                        'roles' => ['?', User::GROUP_CLIENT, User::GROUP_OPERATOR],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create', 'update', 'delete', 'list', ],
+                        'roles' => [User::GROUP_OPERATOR],
+                    ],
+                ],
+            ],
         ];
+    }
+
+    /**
+     * Lists all Good models.
+     * @return mixed
+     */
+    public function actionList()
+    {
+        $searchModel = new GoodSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('list', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     /**
@@ -34,6 +71,7 @@ class GoodController extends Controller
     {
         $searchModel = new GoodSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        Url::remember();
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -48,6 +86,7 @@ class GoodController extends Controller
      */
     public function actionView($id)
     {
+        Url::remember();
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -61,9 +100,16 @@ class GoodController extends Controller
     public function actionCreate()
     {
         $model = new Good();
+        $model->loadDefaultValues();
+
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->gd_id]);
+            return $this->redirect(['list', ]);
+//            return $this->redirect(['view', 'id' => $model->gd_id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -81,8 +127,14 @@ class GoodController extends Controller
     {
         $model = $this->findModel($id);
 
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->gd_id]);
+            return $this->redirect(['list', ]);
+//            return $this->redirect(['view', 'id' => $model->gd_id]);
         } else {
             return $this->render('update', [
                 'model' => $model,

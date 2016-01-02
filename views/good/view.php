@@ -2,18 +2,16 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Good */
 
-$this->title = $model->gd_id;
-$this->params['breadcrumbs'][] = ['label' => 'Goods', 'url' => ['index']];
+$this->title = $model->gd_title;
+$this->params['breadcrumbs'][] = ['label' => 'Подарки', 'url' => [Yii::$app->user->can(User::GROUP_OPERATOR) ? 'list' : 'index']];
 $this->params['breadcrumbs'][] = $this->title;
-?>
-<div class="good-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
+/*
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->gd_id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->gd_id], [
@@ -24,19 +22,31 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'gd_id',
+ */
+$attributes = [
+//            'gd_id',
             'gd_title',
-            'gd_imagepath',
+//            'gd_imagepath',
             'gd_description:ntext',
             'gd_price',
             'gd_number',
-            'gd_active',
-            'gd_created',
-        ],
+//            'gd_active',
+        ];
+if( Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+    $attributes[] = 'gd_created';
+}
+?>
+<div class="good-view">
+
+    <?= DetailView::widget([
+        'model' => $model,
+        'attributes' => $attributes,
     ]) ?>
+
+    <?php if( Yii::$app->user->can(User::GROUP_CLIENT) ) { ?>
+        <p>
+            <?php echo Html::a('В корзину', ['userorder/append', 'goodid' => $model->gd_id], ['class' => 'btn btn-success', 'title' => 'Добавить в корзину']); ?>
+        </p>
+    <?php } ?>
 
 </div>

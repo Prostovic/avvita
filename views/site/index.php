@@ -1,6 +1,8 @@
 <?php
 
 use app\models\User;
+use yii\helpers\Html;
+
 $aPerm = [
     User::GROUP_CLIENT,
     User::GROUP_OPERATOR,
@@ -9,14 +11,14 @@ $aPerm = [
 ];
 /* @var $this yii\web\View */
 
-$this->title = 'My Yii Application';
+$this->title = Yii::$app->name;
 
 
 ?>
 <div class="site-index">
 
     <div class="jumbotron">
-        <h1>Congratulations!</h1>
+        <h1><?php echo Html::encode($this->title); ?></h1>
 
         <p class="lead">You have successfully created your Yii-powered application.</p>
 

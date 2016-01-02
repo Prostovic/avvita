@@ -43,12 +43,18 @@ class UserorderSearch extends Userorder
     public function search($params)
     {
         $query = Userorder::find();
+        $query->with(['items', 'user']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
 
         $this->load($params);
+
+        $oUser = Yii::$app->user;
+        if( !$oUser->can(User::GROUP_ADMIN) && !$oUser->can(User::GROUP_OPERATOR) ) {
+            $this->ord_us_id = $oUser->getId();
+        }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails

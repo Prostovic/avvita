@@ -8,6 +8,11 @@ use app\models\UserorderSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
+
+use app\models\User;
 
 /**
  * UserorderController implements the CRUD actions for Userorder model.
@@ -23,6 +28,22 @@ class UserorderController extends Controller
                     'delete' => ['post'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'update', 'delete', 'list', 'append', ], // 'view', 'delete',
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['list', 'append', 'update', ],
+                        'roles' => [ User::GROUP_CLIENT, ],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'update', 'delete', ],
+                        'roles' => [User::GROUP_OPERATOR],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -31,6 +52,21 @@ class UserorderController extends Controller
      * @return mixed
      */
     public function actionIndex()
+    {
+        $searchModel = new UserorderSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all Userorder models.
+     * @return mixed
+     */
+    public function actionList()
     {
         $searchModel = new UserorderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -69,6 +105,25 @@ class UserorderController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+
+    /**
+     * Добавление к заказу товара
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id id товара
+     * @return mixed
+     */
+    public function actionAppend($id)
+    {
+        $model = Userorder::getActiveOrder();
+
+        if( !$model->addGood($id) ) {
+            return $this->render('error', [
+                'model' => $model,
+            ]);
+        }
+
+        return $this->goBack();
     }
 
     /**

@@ -21,6 +21,16 @@ echo Nav::widget([
     'items' => [
         ['label' => 'Главная', 'url' => ['/']],
         [
+            'label' => 'Подарки',
+            'items' => [
+                ['label' => 'Все подарки', 'url' => ['good/index']],
+                '<li class="dropdown-header">Все подарки в системе</li>',
+                '<li class="divider"></li>',
+                ['label' => 'Заказанные', 'url' => ['userorder/list', ]],
+                '<li class="dropdown-header">Выбранные и заказанные</li>',
+            ],
+        ],
+        [
             'label' => 'Заказы',
             'items' => [
                 ['label' => 'Список', 'url' => ['userdata/index']],

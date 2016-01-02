@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\Userorder;
 
 /**
  * This is the model class for table "{{%orderitem}}".
@@ -44,5 +45,15 @@ class Orderitem extends \yii\db\ActiveRecord
             'ordit_gd_id' => 'Товар',
             'ordit_count' => 'Кол-во',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrder() {
+        return $this->hasOne(
+            Userorder::className(),
+            ['ord_id' => 'ordit_ord_id']
+        );
     }
 }
