@@ -69,6 +69,7 @@ class Userorder extends ActiveRecord
             'ord_summ' => 'Сумма',
             'ord_flag' => 'Состояние',
             'ord_created' => 'Создан',
+            'items' => 'Состав',
         ];
     }
 
@@ -120,6 +121,16 @@ class Userorder extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getGoods() {
+        return $this->hasMany(
+            Orderitem::className(),
+            ['ordit_ord_id' => 'ord_id']
+        )->inverseOf('order')->with(['good']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getUser() {
         return $this->hasOne(
             User::className(),
@@ -146,14 +157,6 @@ class Userorder extends ActiveRecord
     public function getStatetitle() {
         $a = self::getOrderStates();
         return isset($a[$this->ord_flag]) ? $a[$this->ord_flag] : '???';
-    }
-    /**
-     * @param integer $id good id
-     * @return bool
-     */
-    public function addGood($id) {
-
-        return true;
     }
 
 }

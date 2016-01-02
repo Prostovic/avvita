@@ -9,4 +9,7 @@ return [
     2 => [
         'operator',
     ],
+    12 => [
+        'client',
+    ],
 ];

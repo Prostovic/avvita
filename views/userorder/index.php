@@ -6,6 +6,7 @@ use yii\helpers\ArrayHelper;
 
 use app\models\User;
 use app\models\Userorder;
+use app\models\Orderitem;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserorderSearch */
@@ -33,6 +34,21 @@ $columns = array_merge(
             }
         ],
         'ord_summ',
+        [
+            'class' => 'yii\grid\DataColumn',
+            'attribute' => 'ord_summ',
+            'value' => function ($model, $key, $index, $column) {
+                /** @var Userorder $model */
+                $nSum = 0;
+                $nCou = 0;
+                foreach($model->goods As $oItem) {
+                    /** @var Orderitem $oItem */
+                    $nCou++;
+                    $nSum += $oItem->ordit_count * $oItem->good->gd_price;
+                }
+                return 'Подарков: ' . $nCou . ' на сумму: ' . $nSum;
+            }
+        ],
     //    'ord_created',
 
         ['class' => 'yii\grid\ActionColumn'],

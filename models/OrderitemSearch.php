@@ -42,6 +42,8 @@ class OrderitemSearch extends Orderitem
     {
         $query = Orderitem::find();
 
+        $query->with(['ordered']);
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);

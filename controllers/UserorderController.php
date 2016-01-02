@@ -13,6 +13,7 @@ use yii\web\Response;
 use yii\widgets\ActiveForm;
 
 use app\models\User;
+use app\components\Orderhelper;
 
 /**
  * UserorderController implements the CRUD actions for Userorder model.
@@ -85,7 +86,7 @@ class UserorderController extends Controller
     public function actionView($id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($id, ['goods']),
         ]);
     }
 
@@ -96,15 +97,16 @@ class UserorderController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Userorder();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->ord_id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
+        return $this->redirect([Yii::$app->user->can(User::GROUP_OPERATOR) ? 'index' : 'list']);
+//        $model = new Userorder();
+//
+//        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+//            return $this->redirect([Yii::$app->user->can(User::GROUP_OPERATOR) ? 'index' : 'list']);
+//        } else {
+//            return $this->render('create', [
+//                'model' => $model,
+//            ]);
+//        }
     }
 
     /**
@@ -115,9 +117,10 @@ class UserorderController extends Controller
      */
     public function actionAppend($id)
     {
-        $model = Userorder::getActiveOrder();
 
-        if( !$model->addGood($id) ) {
+        $model = Orderhelper::addGood($id);
+        /** @var Userorder $model */
+        if( $model->hasErrors() ) {
             return $this->render('error', [
                 'model' => $model,
             ]);
@@ -153,9 +156,10 @@ class UserorderController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        return $this->redirect([Yii::$app->user->can(User::GROUP_OPERATOR) ? 'index' : 'list']);
+//        $this->findModel($id)->delete();
+//
+//        return $this->redirect(['index']);
     }
 
     /**
@@ -165,9 +169,13 @@ class UserorderController extends Controller
      * @return Userorder the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $with = [])
     {
-        if (($model = Userorder::findOne($id)) !== null) {
+        $model = Userorder::find()
+            ->where(['ord_id' => $id])
+            ->with($with)
+            ->one();
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

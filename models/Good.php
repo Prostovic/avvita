@@ -7,6 +7,8 @@ use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
+use app\models\Orderitem;
+
 /**
  * This is the model class for table "{{%good}}".
  *
@@ -21,6 +23,7 @@ use yii\db\Expression;
  */
 class Good extends \yii\db\ActiveRecord
 {
+    public $orderredcount = 0;
 
     public function behaviors()
     {
@@ -63,7 +66,7 @@ class Good extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'gd_id' => 'Gd ID',
+            'gd_id' => 'ID',
             'gd_title' => 'Наименование',
             'gd_imagepath' => 'Изображение',
             'gd_description' => 'Описание',
@@ -71,6 +74,31 @@ class Good extends \yii\db\ActiveRecord
             'gd_number' => 'Кол-во',
             'gd_active' => 'Показать',
             'gd_created' => 'Создан',
+            'items' => 'В заказах',
+            'orderredcount' => 'Заказано',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItems() {
+        return $this->hasMany(
+            Orderitem::className(),
+            [
+                'ordit_gd_id' => 'gd_id'
+            ]
+        );
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrdered() {
+        return $this
+            ->getItems()
+            ->select('SUM() As orderredcount')
+            ->groupBy(['ordit_gd_id'])
+            ->scalar();
     }
 }

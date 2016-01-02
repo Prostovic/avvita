@@ -43,7 +43,7 @@ class UserorderSearch extends Userorder
     public function search($params)
     {
         $query = Userorder::find();
-        $query->with(['items', 'user']);
+        $query->with(['goods', 'user']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

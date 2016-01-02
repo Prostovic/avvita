@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use app\models\Userorder;
+use app\models\Good;
 
 /**
  * This is the model class for table "{{%orderitem}}".
@@ -54,6 +55,16 @@ class Orderitem extends \yii\db\ActiveRecord
         return $this->hasOne(
             Userorder::className(),
             ['ord_id' => 'ordit_ord_id']
+        );
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGood() {
+        return $this->hasOne(
+            Good::className(),
+            ['gd_id' => 'ordit_gd_id']
         );
     }
 }
