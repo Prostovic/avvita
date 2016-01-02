@@ -40,7 +40,11 @@ $attributes = [
                     . $dop
                     . $item->good->gd_title
                     . ' '
-                    . $item->ordit_count;
+                    . $item->ordit_count
+                    . ' шт. * '
+                    . $item->good->gd_price
+                    . ' = '
+                    . ($item->ordit_count * $item->good->gd_price);
             },
             ''
         ),

@@ -16,6 +16,8 @@ use app\models\Good;
  */
 class Orderitem extends \yii\db\ActiveRecord
 {
+    public $orderredcount = 0;
+
     /**
      * @inheritdoc
      */
@@ -45,6 +47,7 @@ class Orderitem extends \yii\db\ActiveRecord
             'ordit_ord_id' => 'Заказ',
             'ordit_gd_id' => 'Товар',
             'ordit_count' => 'Кол-во',
+            'orderredcount' => 'Заказано',
         ];
     }
 

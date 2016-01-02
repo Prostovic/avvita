@@ -23,8 +23,6 @@ use app\models\Orderitem;
  */
 class Good extends \yii\db\ActiveRecord
 {
-    public $orderredcount = 0;
-
     public function behaviors()
     {
         return [
@@ -75,7 +73,7 @@ class Good extends \yii\db\ActiveRecord
             'gd_active' => 'Показать',
             'gd_created' => 'Создан',
             'items' => 'В заказах',
-            'orderredcount' => 'Заказано',
+            'ordered' => 'Заказано',
         ];
     }
 
@@ -97,8 +95,6 @@ class Good extends \yii\db\ActiveRecord
     public function getOrdered() {
         return $this
             ->getItems()
-            ->select('SUM() As orderredcount')
-            ->groupBy(['ordit_gd_id'])
-            ->scalar();
+            ->sum('ordit_count');
     }
 }

@@ -31,6 +31,21 @@ $this->params['breadcrumbs'][] = $this->title;
 //            'gd_description:ntext',
             'gd_price',
             'gd_number',
+            [
+                'class' => 'yii\grid\DataColumn',
+                'attribute' => 'ordered',
+//        'value' => function ($model, $key, $index, $column) {
+//            /** @var Userorder $model */
+//            $nSum = 0;
+//            $nCou = 0;
+//            foreach($model->goods As $oItem) {
+//                /** @var Orderitem $oItem */
+//                $nCou++;
+//                $nSum += $oItem->ordit_count * $oItem->good->gd_price;
+//            }
+//            return 'Подарков: ' . $nCou . ' на сумму: ' . $nSum;
+//        }
+            ],
             // 'gd_active',
             // 'gd_created',
 

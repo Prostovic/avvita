@@ -21,6 +21,7 @@ class GoodSearch extends Good
             [['gd_id', 'gd_number', 'gd_active'], 'integer'],
             [['gd_title', 'gd_imagepath', 'gd_description', 'gd_created'], 'safe'],
             [['gd_price'], 'number'],
+            [['ordered'], 'save'],
         ];
     }
 
@@ -43,6 +44,11 @@ class GoodSearch extends Good
     public function search($params)
     {
         $query = Good::find();
+        $subQuery = Orderitem::find()
+            ->select('ordit_gd_id, SUM(ordit_count) as ordered')
+            ->groupBy('ordit_gd_id');
+
+        $query->leftJoin(['goodCount' => $subQuery], 'goodCount.ordit_gd_id = gd_id');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

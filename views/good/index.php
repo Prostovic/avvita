@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use app\models\User;
+use app\models\Orderitem;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\GoodSearch */
@@ -16,6 +17,21 @@ $columns = [
 //    'gd_description:ntext',
     'gd_price',
     'gd_number',
+    [
+        'class' => 'yii\grid\DataColumn',
+        'attribute' => 'ordered',
+        'value' => function ($model, $key, $index, $column) {
+            /** @var Good $model */
+//            $nSum = 0;
+//            $nCou = 0;
+//            foreach($model->goods As $oItem) {
+//                /** @var Orderitem $oItem */
+//                $nCou++;
+//                $nSum += $oItem->ordit_count * $oItem->good->gd_price;
+//            }
+            return 1; // $model->ordered[0]->orderredcount;
+        }
+    ],
     [
         'class' => 'yii\grid\ActionColumn',
         'template' => '{view}' . (Yii::$app->user->can(User::GROUP_CLIENT) ? ' {order}' : ''),
