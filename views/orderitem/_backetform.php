@@ -41,10 +41,17 @@ if( $showedit ) {
         'validateOnType' => false,
         'validateOnSubmit' => true,
     ]);
+?>
+    <div class="form-group">
+<?php
+    echo $form->field($order, 'ord_id', ['template' => "{input}\n{error}"])->hiddenInput();
+?>
+    </div>
+<?php
 }
 ?>
 
-    <table class="table table-striped table-bordered">
+    <table class="table table-striped table-bordered table-hover">
         <thead>
         <tr>
             <th>Нименование</th>
@@ -113,7 +120,39 @@ foreach($items As $obItem) {
 
 <?php
 if( $showedit ) {
+?>
+    <div class="form-group">
+<?php
+    echo Html::submitButton('Сохранить', ['class' => 'btn btn-success']);
+?>
+    </div>
+<?php
     ActiveForm::end();
+    $sJs = <<<EOT
+var fChangeCount = function(ob, nDelta) {
+    var nCur = parseInt(ob.val());
+    if( (nDelta < 0 && ((nCur + nDelta) >= 0)) || (nDelta > 0) ) {
+        nCur = nCur + nDelta;
+        ob.val(nCur)
+    }
+};
+jQuery(".countminus, .countplus")
+    .on(
+        "click",
+        function(event){
+            event.preventDefault();
+            var oLink = jQuery(this), oInp = oLink.siblings("input:first");
+            if( oLink.hasClass("countminus") ) {
+                fChangeCount(oInp, -1);
+            }
+            else {
+                fChangeCount(oInp, 1);
+            }
+            return false;
+        }
+    );
+EOT;
+$this->registerJs($sJs);
 }
 ?>
 

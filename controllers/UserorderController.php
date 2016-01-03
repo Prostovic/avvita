@@ -11,8 +11,11 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
+use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 
 use app\models\User;
+use app\models\Orderitem;
 use app\components\Orderhelper;
 
 /**
@@ -130,18 +133,75 @@ class UserorderController extends Controller
     }
 
     /**
-     *
      * @param integer $id id товара
      * @return mixed
      */
     public function actionValidate($id)
     {
+        Yii::info('actionValidate($id) _POST: ' . print_r($_POST, true));
         Yii::$app->response->format = Response::FORMAT_JSON;
         if (Yii::$app->request->isAjax ) { // && $model->load(Yii::$app->request->post())
-//            return ActiveForm::validate($model);
+            return $this->validateOrder($id);
         }
 
         return [];
+    }
+
+    /**
+     * @param integer $id id товара
+     * @return mixed
+     */
+    public function validateOrder($id)
+    {
+        $orderId = Html::getInputId(new Userorder(), 'ord_id');
+        $result = [];
+        try {
+            $model = $this->findModel($id);
+        }
+        catch( \Exception $e ) {
+            $result[$orderId] = ['Не найден заказ'];
+            return $result;
+        }
+
+        $items = $model->goods;
+        $aId = ArrayHelper::map($items, 'ordit_id', 'ordit_gd_id');
+        $aOrdered = Orderitem::find()
+            ->select('ordit_gd_id, SUM(ordit_count) as orderredcount')
+            ->groupBy('ordit_gd_id')
+            ->where(['ordit_gd_id' => $aId])
+            ->all();
+        $aCount = ArrayHelper::map($aOrdered, 'ordit_gd_id', 'orderredcount');
+//        Yii::info(print_r($items, true));
+        foreach( $items as $obItem) {
+            /** @var Orderitem $obItem */
+            $sFormName = $obItem->formName();
+            $oName = Html::getInputName($obItem, '[' . $obItem->ordit_id . ']ordit_count');
+            $bSet = isset($_POST[$sFormName]) && isset($_POST[$sFormName][$obItem->ordit_id]) && isset($_POST[$sFormName][$obItem->ordit_id]['ordit_count']);
+            Yii::info('POST: ' . $oName . ' ' . ($bSet ? $_POST[$sFormName][$obItem->ordit_id]['ordit_count'] : 'NOT exists'));
+            Yii::info('COUNT: ' . $obItem->ordit_gd_id . ' ('.$obItem->ordit_count.') ordered: ' . (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : '--??--'));
+            if( $obItem->good->gd_number > 0 ) {
+                $nRes = $obItem->good->gd_number
+                    - (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : 0)
+                    + $obItem->ordit_count
+                    - ($bSet ? intval($_POST[$sFormName][$obItem->ordit_id]['ordit_count'], 10) : 0);
+                Yii::info('nRes = ' . $nRes);
+                if( $nRes < 0 ) {
+                    $result[Html::getInputId($obItem, '[' . $obItem->ordit_id . ']ordit_count')] = [
+                        'Максимальное количество для заказа: ' . (
+                            $obItem->good->gd_number
+                            - (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : 0)
+                            + $obItem->ordit_count
+                        )
+                    ];
+                }
+            }
+//            $obItem
+        }
+
+        $result[$orderId] = ['Count: ' . count($items)];
+        Yii::info(print_r($result, true));
+        // $result[Html::getInputId($model, $attribute)] = $errors;
+        return $result;
     }
 
     /**
