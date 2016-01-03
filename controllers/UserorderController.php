@@ -130,6 +130,21 @@ class UserorderController extends Controller
     }
 
     /**
+     *
+     * @param integer $id id товара
+     * @return mixed
+     */
+    public function actionValidate($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if (Yii::$app->request->isAjax ) { // && $model->load(Yii::$app->request->post())
+//            return ActiveForm::validate($model);
+        }
+
+        return [];
+    }
+
+    /**
      * Updates an existing Userorder model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
