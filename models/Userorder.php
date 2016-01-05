@@ -52,7 +52,8 @@ class Userorder extends ActiveRecord
     {
         return [
             [['ord_us_id', ], 'required'],
-            [['ord_us_id', 'ord_flag'], 'integer'],
+            [['ord_us_id', 'ord_flag', ], 'integer'],
+            [['ord_id'], 'integer', 'skipOnEmpty'=>true],
             [['ord_summ'], 'number'],
             [['ord_created'], 'safe']
         ];

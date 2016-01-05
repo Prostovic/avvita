@@ -181,7 +181,7 @@ class UserorderController extends Controller
             if( !$bSet ) {
                 continue;
             }
-            $obItem->load($_POST[$sFormName][$obItem->ordit_id], '');
+//            $obItem->load($_POST[$sFormName][$obItem->ordit_id], '');
             Yii::info('POST: ' . $oName . ' ' . ($bSet ? $_POST[$sFormName][$obItem->ordit_id]['ordit_count'] : 'NOT exists'));
             Yii::info('COUNT: ' . $obItem->ordit_gd_id . ' ('.$obItem->ordit_count.') ordered: ' . (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : '--??--'));
             if( $obItem->good->gd_number > 0 ) {
@@ -200,12 +200,12 @@ class UserorderController extends Controller
                     ];
                 }
             }
-            $nSumm += $obItem->ordit_count * $obItem->good->gd_price;
+            $nSumm += ($bSet ? intval($_POST[$sFormName][$obItem->ordit_id]['ordit_count'], 10) : 0) * $obItem->good->gd_price;
             Yii::info('SUMM: ' . $nSumm . ' ('.$obItem->ordit_count . ' * ' . $obItem->good->gd_price.')');
 //            $obItem
         }
         $nUserMoney = Orderhelper::calculateUserMoney($model->ord_us_id, Orderhelper::CALC_TYPE_BOTH);
-        $result[$orderId] = ['Сумма покупок: ' . $nSumm];
+//        $result[$orderId] = ['Сумма покупок: ' . $nSumm];
         if( $nSumm > $nUserMoney ) {
             if( isset($result[$orderId]) ) {
                 $result[$orderId][] = 'Максимальная сумма заказа не должна превышать ' . $nUserMoney;
