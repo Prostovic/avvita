@@ -171,12 +171,17 @@ class UserorderController extends Controller
             ->where(['ordit_gd_id' => $aId])
             ->all();
         $aCount = ArrayHelper::map($aOrdered, 'ordit_gd_id', 'orderredcount');
+        $nSumm = 0;
 //        Yii::info(print_r($items, true));
         foreach( $items as $obItem) {
             /** @var Orderitem $obItem */
             $sFormName = $obItem->formName();
             $oName = Html::getInputName($obItem, '[' . $obItem->ordit_id . ']ordit_count');
             $bSet = isset($_POST[$sFormName]) && isset($_POST[$sFormName][$obItem->ordit_id]) && isset($_POST[$sFormName][$obItem->ordit_id]['ordit_count']);
+            if( !$bSet ) {
+                continue;
+            }
+            $obItem->load($_POST[$sFormName][$obItem->ordit_id], '');
             Yii::info('POST: ' . $oName . ' ' . ($bSet ? $_POST[$sFormName][$obItem->ordit_id]['ordit_count'] : 'NOT exists'));
             Yii::info('COUNT: ' . $obItem->ordit_gd_id . ' ('.$obItem->ordit_count.') ordered: ' . (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : '--??--'));
             if( $obItem->good->gd_number > 0 ) {
@@ -195,10 +200,22 @@ class UserorderController extends Controller
                     ];
                 }
             }
+            $nSumm += $obItem->ordit_count * $obItem->good->gd_price;
+            Yii::info('SUMM: ' . $nSumm . ' ('.$obItem->ordit_count . ' * ' . $obItem->good->gd_price.')');
 //            $obItem
         }
+        $nUserMoney = Orderhelper::calculateUserMoney($model->ord_us_id, Orderhelper::CALC_TYPE_BOTH);
+        $result[$orderId] = ['Сумма покупок: ' . $nSumm];
+        if( $nSumm > $nUserMoney ) {
+            if( isset($result[$orderId]) ) {
+                $result[$orderId][] = 'Максимальная сумма заказа не должна превышать ' . $nUserMoney;
+            }
+            else {
+                $result[$orderId] = ['Максимальная сумма заказа не должна превышать ' . $nUserMoney];
+            }
+        }
 
-        $result[$orderId] = ['Count: ' . count($items)];
+//        $result[$orderId] = ['Count: ' . count($items)];
         Yii::info(print_r($result, true));
         // $result[Html::getInputId($model, $attribute)] = $errors;
         return $result;

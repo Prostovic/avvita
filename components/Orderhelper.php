@@ -14,8 +14,13 @@ use yii\db\Query;
 use app\models\Userorder;
 use app\models\Orderitem;
 use app\models\Good;
+use app\models\Userdata;
+use app\models\Docdata;
 
 class Orderhelper {
+    const CALC_TYPE_INCR = 0; // начисленные баллы
+    const CALC_TYPE_USED = 1; // баллы в выполненных заказах
+    const CALC_TYPE_BOTH = 2; // итоговая сумма - разность между начисленными и потраченными балами в выполненных заказах
 
     /**
      * @param integer $id good id
@@ -100,5 +105,28 @@ class Orderhelper {
         return $nInOrders;
     }
 
+    /**
+     * @param int $uid
+     * @param int $nType
+     * @return int
+     */
+    public static function calculateUserMoney($uid, $nType = self::CALC_TYPE_INCR) {
+        $nSumm = 0;
+
+        if( ($nType == self::CALC_TYPE_INCR) || ($nType == self::CALC_TYPE_BOTH) ) {
+            $sIncr = 'Select SUM(dt.doc_summ) As nplus'
+                . ' From ' . Userdata::tableName() . ' ud, ' . Docdata::tableName() . ' dt'
+                . ' Where ud.ud_us_id = ' . intval($uid, 10) . ' And dt.doc_key = ud.ud_doc_key';
+            $nSumm = Yii::$app->db->createCommand($sIncr)->queryScalar();
+        }
+
+        if( ($nType == self::CALC_TYPE_USED) || ($nType == self::CALC_TYPE_BOTH) ) {
+            $sDecr = 'Select SUM(od.ord_summ) As nminus'
+                . ' From ' . Userorder::tableName() . ' od'
+                . ' Where od.ord_flag In (' . implode(', ', [Userorder::ORDER_FLAG_COMPLETED, Userorder::ORDER_FLAG_SENDED]) . ') And od.ord_us_id = ' . intval($uid, 10);
+            $nSumm += Yii::$app->db->createCommand($sDecr)->queryScalar() * ($nType == self::CALC_TYPE_BOTH ? -1 : 1);
+        }
+        return $nSumm;
+    }
 
 }

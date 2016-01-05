@@ -44,7 +44,8 @@ if( $showedit ) {
 ?>
     <div class="form-group">
 <?php
-    echo $form->field($order, 'ord_id', ['template' => "{input}\n{error}"])->hiddenInput();
+//    echo $form->field($order, 'ord_id', ['template' => "{input}\n{error}"])->hiddenInput();
+    echo $form->field($order, 'ord_id', ['template' => "{input}\n{error}"])->textInput(); // hiddenInput();
 ?>
     </div>
 <?php
