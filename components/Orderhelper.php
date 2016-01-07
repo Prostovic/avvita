@@ -10,6 +10,8 @@ namespace app\components;
 
 use yii;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 use app\models\Userorder;
 use app\models\Orderitem;
@@ -23,13 +25,13 @@ class Orderhelper {
     const CALC_TYPE_BOTH = 2; // итоговая сумма - разность между начисленными и потраченными балами в выполненных заказах
 
     /**
+     * @param Userorder $model
      * @param integer $id good id
      * @return Userorder
      */
-    public static function addGood($id) {
+    public static function addGood(&$model, $id) {
 
-        $model = Userorder::getActiveOrder();
-
+//        $model = Userorder::getActiveOrder();
         $oGood = Good::findOne($id);
         if( $oGood === null ) {
             $model->addError('ord_id', 'Не найден требуемый подарок');
@@ -106,6 +108,7 @@ class Orderhelper {
     }
 
     /**
+     * Подсчет баллов у пользователя: полученных, потраченных или общий итог
      * @param int $uid
      * @param int $nType
      * @return int
@@ -129,4 +132,107 @@ class Orderhelper {
         return $nSumm;
     }
 
+    /**
+     * @param Userorder $model
+     */
+    public static function validateOrder(&$model) {
+        $items = $model->goods;
+        Yii::info('validateOrder() ' . print_r($model->attributes, true));
+
+        // ищем сколько уже в заказах
+        $aId = ArrayHelper::map($items, 'ordit_id', 'ordit_gd_id');
+        $aOrdered = Orderitem::find()
+            ->select('ordit_gd_id, SUM(ordit_count) as orderredcount')
+            ->groupBy('ordit_gd_id')
+            ->where(['ordit_gd_id' => $aId])
+            ->all();
+        $aCount = ArrayHelper::map($aOrdered, 'ordit_gd_id', 'orderredcount');
+
+        $nSumm = 0; // общая стоимость заказа
+
+        Yii::info('validateOrder() aCount = ' . print_r($aCount, true));
+        Yii::info('validateOrder() _POST = ' . print_r($_POST, true));
+        foreach( $items as &$obItem) {
+            /** @var Orderitem $obItem */
+            $sFormName = $obItem->formName();
+            Yii::info('validateOrder() obItem = ' . print_r($obItem->attributes, true));
+            $bSet = isset($_POST[$sFormName]) && isset($_POST[$sFormName][$obItem->ordit_id]) && isset($_POST[$sFormName][$obItem->ordit_id]['ordit_count']);
+            if( !$bSet ) {
+                Yii::info('validateOrder() NOT SET');
+                $obItem->addError('ordit_count', 'Не найдены данные для данного элемента');
+                $model->addError('ord_id', 'Ошибка поиска элемента заказа');
+                continue;
+            }
+
+            $nOldCount = $obItem->ordit_count;
+            $obItem->load($_POST[$sFormName][$obItem->ordit_id], '');
+
+            if( $obItem->good->gd_number > 0 ) {
+                // если есть ограничение на общее кол-во подарков,
+                // проверяем на максимально возможное кол-во в заказе
+                $nRes = $obItem->good->gd_number
+                    - (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : 0)
+                    + $nOldCount
+                    - ($bSet ? intval($_POST[$sFormName][$obItem->ordit_id]['ordit_count'], 10) : 0);
+                Yii::info('gd_number = '
+                    . $obItem->good->gd_number
+                    . ' - '
+                    . (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : 0)
+                    . ' + '
+                    . $nOldCount
+                    . ' - '
+                    . ($bSet ? intval($_POST[$sFormName][$obItem->ordit_id]['ordit_count'], 10) : 0)
+                );
+                Yii::info('nRes = ' . $nRes);
+                if( $nRes < 0 ) {
+                    $nMax = $obItem->good->gd_number
+                        - (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : 0)
+                        + $nOldCount;
+                    $sErr = 'Максимальное количество для заказа: ' . $nMax;
+
+                    $obItem->addError('ordit_count', $sErr);
+                    $model->addError('ord_id', $obItem->good->gd_title . ': превышает допустимое количество ' . $nMax);
+                }
+            }
+
+            $nSumm += $obItem->ordit_count * $obItem->good->gd_price;
+        }
+
+        $nUserMoney = self::calculateUserMoney($model->ord_us_id, self::CALC_TYPE_BOTH);
+        Yii::info('validateOrder() nSumm = ' . $nSumm . ' nUserMoney = ' . $nUserMoney);
+
+        if( $nSumm > $nUserMoney ) {
+            $sErr = 'Максимальная сумма заказа не должна превышать ' . $nUserMoney;
+            $model->addError('ord_id', $sErr);
+        }
+    }
+
+    /**
+     * @param Userorder $model
+     * @return array
+     */
+    public static function getOrderErrors(&$model)
+    {
+        Yii::info('getOrderErrors()');
+        $result = [];
+        if( $model->hasErrors() ) {
+            Yii::info('getOrderErrors() model->hasErrors = ' . print_r($model->getErrors(), true));
+            foreach($model->getErrors() As $k=>$v) {
+                $sId = Html::getInputId($model, $k);
+                $result[$sId] = $v;
+            }
+        }
+        foreach($model->goods As $obItem) {
+            /** @var Orderitem $obItem */
+            if( $obItem->hasErrors() ) {
+                foreach($obItem->getErrors() As $k=>$v) {
+                    $sId = Html::getInputId($obItem, '['.$obItem->ordit_id.']' . $k);
+                    $result[$sId] = $v;
+                    Yii::info('getOrderErrors() obItem['.$obItem->ordit_id.']->getErrors = ' . print_r($obItem->getErrors(), true));
+                }
+            }
+        }
+        Yii::info('getOrderErrors() result = ' . print_r($result, true));
+        return $result;
+    }
 }

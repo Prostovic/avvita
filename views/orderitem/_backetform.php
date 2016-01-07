@@ -29,7 +29,7 @@ if( $showedit ) {
             'template' => '<a class="btn btn-success countminus" href="#" style="float: left;"><span class="glyphicon glyphicon-minus"></span></a>'
                         . '{input}'
                         . '<a class="btn btn-success countplus" href="#" style="float: left;"><span class="glyphicon glyphicon-plus"></span></a>'
-                        . "\n{error}",
+                        . "<div class=\"clearfix\"></div>\n{error}",
             'options' => ['class' => 'form-group col-md-6'],
             'labelOptions'=>['class'=>'control-label col-md-6'],
         ],
@@ -41,14 +41,6 @@ if( $showedit ) {
         'validateOnType' => false,
         'validateOnSubmit' => true,
     ]);
-?>
-    <div class="form-group">
-<?php
-//    echo $form->field($order, 'ord_id', ['template' => "{input}\n{error}"])->hiddenInput();
-    echo $form->field($order, 'ord_id', ['template' => "{input}\n{error}"])->textInput(); // hiddenInput();
-?>
-    </div>
-<?php
 }
 ?>
 
@@ -58,16 +50,19 @@ if( $showedit ) {
             <th>Нименование</th>
             <th>Кол-во</th>
             <?php
-                if( !$showedit ) {
+//                if( !$showedit ) {
             ?>
             <th>Баллы</th>
+            <th>Сумма</th>
             <?php
-                }
+//                }
             ?>
         </tr>
         </thead>
         <tbody>
 <?php
+$aPrices = [];
+$nSumm = 0;
 foreach($items As $obItem) {
     /** @var Orderitem $obItem */
     ?>
@@ -75,7 +70,7 @@ foreach($items As $obItem) {
         <td>
             <?php echo Html::encode($obItem->good->gd_title); ?>
         </td>
-        <td class="<?php echo $showedit ? '' : 'text-right'; ?>">
+        <td class="<?php echo $showedit ? '' : 'text-right'; ?> num_good">
             <?php
             if( $showedit ) {
 //                echo Html::a(
@@ -95,27 +90,37 @@ foreach($items As $obItem) {
             }
             ?>
         </td>
-        <?php
-        if( !$showedit ) {
+        <td class="text-right one_value">
+            <?php
+            $aPrices[$obItem->ordit_id] = $obItem->good->gd_price;
+            echo $obItem->good->gd_price;
             ?>
-            <td class="text-right">
-                <?php
-                echo $obItem->ordit_count
-                    . ' * '
-                    . $obItem->good->gd_price
-                    . ' = '
-                    . ($obItem->good->gd_price * $obItem->ordit_count);
-                ?>
-            </td>
-        <?php
-        }
-        ?>
+        </td>
+        <td class="text-right comm_value">
+            <?php
+            $nc = ($obItem->good->gd_price * $obItem->ordit_count);
+            $nSumm += $nc;
+
+            echo $nc;
+            ?>
+        </td>
     </tr>
 <?php
 }
 
 
 ?>
+        <tr>
+            <td></td>
+            <td></td>
+            <td class="text-right"></td>
+            <td class="text-right comm_value">
+                <?php
+                echo $nSumm;
+                ?>
+            </td>
+        </tr>
+
         </tbody>
     </table>
 
@@ -123,13 +128,41 @@ foreach($items As $obItem) {
 if( $showedit ) {
 ?>
     <div class="form-group">
+        <?php
+        echo $form->field($order, 'ord_id', ['template' => "{input}\n{error}"])->hiddenInput();
+        //    echo $form->field($order, 'ord_id', ['template' => "{input}\n{error}"])->textInput(); // hiddenInput();
+        ?>
+    </div>
+    <div class="clearfix"></div>
+    <div class="form-group">
 <?php
     echo Html::submitButton('Сохранить', ['class' => 'btn btn-success']);
 ?>
     </div>
 <?php
     ActiveForm::end();
+    $sPrice = json_encode($aPrices);
     $sJs = <<<EOT
+var fCountSum = function() {
+    var aPrice = {$sPrice},
+        nSum = 0,
+        oTr = null;
+    jQuery(".num_good input").each(function(index, element){
+        var oInp = jQuery(this),
+            sId = /^[^-]+-([\\d]+)-/.exec(oInp.attr("id"))[1],
+            nCou = parseInt(oInp.val(), 10),
+            tdSum = oInp.parents("td:first").siblings("td.comm_value"),
+            nCalc = nCou * aPrice[sId];
+        tdSum.text(nCalc);
+        nSum += nCalc;
+        oTr = tdSum.parent();
+//        console.log(sId + " = " + nCou + " * " + aPrice[sId] + " = " + nCalc);
+    });
+    if( oTr !== null ) {
+        oTr.parent().find("tr:last td.comm_value").text(nSum);
+    }
+    return nSum;
+};
 var fChangeCount = function(ob, nDelta) {
     var nCur = parseInt(ob.val());
     if( (nDelta < 0 && ((nCur + nDelta) >= 0)) || (nDelta > 0) ) {
@@ -149,9 +182,13 @@ jQuery(".countminus, .countplus")
             else {
                 fChangeCount(oInp, 1);
             }
+            oInp.trigger("change");
             return false;
         }
     );
+jQuery(".num_good input").on("change", function(event){
+    fCountSum();
+});
 EOT;
 $this->registerJs($sJs);
 }

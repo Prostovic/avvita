@@ -6,6 +6,7 @@ use Yii;
 use app\models\Userorder;
 use app\models\UserorderSearch;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -88,8 +89,20 @@ class UserorderController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id, ['goods']);
+
+        if( !Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+            if( ($model === null) || (Yii::$app->user->getId() != $model->ord_us_id) ) {
+                throw new ForbiddenHttpException('Вы не можете просматривать данный заказ');
+            }
+        }
+
+        if( Yii::$app->request->isPost && ($model->ord_flag == Userorder::ORDER_FLAG_ACTVE) ) {
+            $this->validateOrder($model, false);
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id, ['goods']),
+            'model' => $model,
         ]);
     }
 
@@ -121,7 +134,8 @@ class UserorderController extends Controller
     public function actionAppend($id)
     {
 
-        $model = Orderhelper::addGood($id);
+        $model = Userorder::getActiveOrder();
+        Orderhelper::addGood($model, $id);
         /** @var Userorder $model */
         if( $model->hasErrors() ) {
             return $this->render('error', [
@@ -138,29 +152,46 @@ class UserorderController extends Controller
      */
     public function actionValidate($id)
     {
-        Yii::info('actionValidate($id) _POST: ' . print_r($_POST, true));
+//        Yii::info('actionValidate($id) _POST: ' . print_r($_POST, true));
         Yii::$app->response->format = Response::FORMAT_JSON;
         if (Yii::$app->request->isAjax ) { // && $model->load(Yii::$app->request->post())
-            return $this->validateOrder($id);
+            $result = [];
+            try {
+                $model = $this->findModel($id, ['goods']);
+            }
+            catch( \Exception $e ) {
+                $result[Html::getInputId(new Userorder(), 'ord_id')] = ['Не найден заказ'];
+                return $result;
+            }
+            Orderhelper::validateOrder($model);
+            return Orderhelper::getOrderErrors($model);
+//            return $this->validateOrder($id, true);
         }
 
         return [];
     }
 
     /**
-     * @param integer $id id товара
+     * @param integer|Userorder $id id заказа
+     * @param boolean $isAjax запрос для ajax валидации, без установки ошибок в модели
      * @return mixed
      */
-    public function validateOrder($id)
+    public function validateOrder(&$id, $isAjax = true)
     {
         $orderId = Html::getInputId(new Userorder(), 'ord_id');
         $result = [];
-        try {
-            $model = $this->findModel($id);
+        if( is_object($id) ) {
+            $model = $id;
         }
-        catch( \Exception $e ) {
-            $result[$orderId] = ['Не найден заказ'];
-            return $result;
+        else {
+            $model = null;
+            try {
+                $model = $this->findModel($id, ['goods']);
+            }
+            catch( \Exception $e ) {
+                $result[$orderId] = ['Не найден заказ'];
+                return $isAjax ? $result : $model;
+            }
         }
 
         $items = $model->goods;
@@ -179,46 +210,59 @@ class UserorderController extends Controller
             $oName = Html::getInputName($obItem, '[' . $obItem->ordit_id . ']ordit_count');
             $bSet = isset($_POST[$sFormName]) && isset($_POST[$sFormName][$obItem->ordit_id]) && isset($_POST[$sFormName][$obItem->ordit_id]['ordit_count']);
             if( !$bSet ) {
+                if( !$isAjax ) {
+                    $obItem->addError('ordit_count', 'Не найдены данные для данного элемента');
+                    $model->addError('ord_id', 'Ошибка поиска элемента заказа');
+                }
                 continue;
             }
-//            $obItem->load($_POST[$sFormName][$obItem->ordit_id], '');
-            Yii::info('POST: ' . $oName . ' ' . ($bSet ? $_POST[$sFormName][$obItem->ordit_id]['ordit_count'] : 'NOT exists'));
-            Yii::info('COUNT: ' . $obItem->ordit_gd_id . ' ('.$obItem->ordit_count.') ordered: ' . (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : '--??--'));
+            if( !$isAjax ) {
+                $obItem->load($_POST[$sFormName][$obItem->ordit_id], '');
+            }
+
+//            Yii::info('POST: ' . $oName . ' ' . ($bSet ? $_POST[$sFormName][$obItem->ordit_id]['ordit_count'] : 'NOT exists'));
+//            Yii::info('COUNT: ' . $obItem->ordit_gd_id . ' ('.$obItem->ordit_count.') ordered: ' . (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : '--??--'));
             if( $obItem->good->gd_number > 0 ) {
                 $nRes = $obItem->good->gd_number
                     - (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : 0)
                     + $obItem->ordit_count
                     - ($bSet ? intval($_POST[$sFormName][$obItem->ordit_id]['ordit_count'], 10) : 0);
-                Yii::info('nRes = ' . $nRes);
+//                Yii::info('nRes = ' . $nRes);
                 if( $nRes < 0 ) {
-                    $result[Html::getInputId($obItem, '[' . $obItem->ordit_id . ']ordit_count')] = [
-                        'Максимальное количество для заказа: ' . (
-                            $obItem->good->gd_number
-                            - (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : 0)
-                            + $obItem->ordit_count
-                        )
-                    ];
+                    $nMax = $obItem->good->gd_number
+                        - (isset($aCount[$obItem->ordit_gd_id]) ? $aCount[$obItem->ordit_gd_id] : 0)
+                        + $obItem->ordit_count;
+                    $sErr = 'Максимальное количество для заказа: ' . $nMax;
+                    if( !$isAjax ) {
+                        $obItem->addError('ordit_count', $sErr);
+                        $model->addError('ord_id', $obItem->good->gd_title . ': превышает допустимое количество ' . $nMax);
+                    }
+                    $result[Html::getInputId($obItem, '[' . $obItem->ordit_id . ']ordit_count')] = [$sErr];
                 }
             }
             $nSumm += ($bSet ? intval($_POST[$sFormName][$obItem->ordit_id]['ordit_count'], 10) : 0) * $obItem->good->gd_price;
-            Yii::info('SUMM: ' . $nSumm . ' ('.$obItem->ordit_count . ' * ' . $obItem->good->gd_price.')');
+//            Yii::info('SUMM: ' . $nSumm . ' ('.$obItem->ordit_count . ' * ' . $obItem->good->gd_price.')');
 //            $obItem
         }
         $nUserMoney = Orderhelper::calculateUserMoney($model->ord_us_id, Orderhelper::CALC_TYPE_BOTH);
 //        $result[$orderId] = ['Сумма покупок: ' . $nSumm];
         if( $nSumm > $nUserMoney ) {
+            $sErr = 'Максимальная сумма заказа не должна превышать ' . $nUserMoney;
             if( isset($result[$orderId]) ) {
-                $result[$orderId][] = 'Максимальная сумма заказа не должна превышать ' . $nUserMoney;
+                $result[$orderId][] = $sErr;
             }
             else {
-                $result[$orderId] = ['Максимальная сумма заказа не должна превышать ' . $nUserMoney];
+                $result[$orderId] = [$sErr];
+            }
+            if( !$isAjax ) {
+                $model->addError('ord_id', $sErr);
             }
         }
 
 //        $result[$orderId] = ['Count: ' . count($items)];
-        Yii::info(print_r($result, true));
+        Yii::info(print_r($isAjax ? $result : $model->getErrors(), true));
         // $result[Html::getInputId($model, $attribute)] = $errors;
-        return $result;
+        return $isAjax ? $result : $model;
     }
 
     /**
