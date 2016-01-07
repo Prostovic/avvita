@@ -5,8 +5,13 @@ namespace app\models;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yii\behaviors\TimestampBehavior;
+use yii\behaviors\AttributeBehavior;
 use yii\db\Expression;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
+
+use app\components\ActionBehavior;
+use app\components\Notificator;
 
 /**
  * This is the model class for table "{{%userorder}}".
@@ -16,6 +21,7 @@ use yii\db\ActiveRecord;
  * @property double $ord_summ
  * @property integer $ord_flag
  * @property string $ord_created
+ * @property string $ord_message
  */
 class Userorder extends ActiveRecord
 {
@@ -23,6 +29,8 @@ class Userorder extends ActiveRecord
     const ORDER_FLAG_ACTVE = 1;
     const ORDER_FLAG_COMPLETED = 2;
     const ORDER_FLAG_SENDED = 3;
+
+    public $_oldFlag = 0;
 
     public function behaviors()
     {
@@ -33,6 +41,34 @@ class Userorder extends ActiveRecord
                     ActiveRecord::EVENT_BEFORE_INSERT => ['ord_created'],
                 ],
                 'value' => new Expression('NOW()'),
+            ],
+            [
+                'class' => ActionBehavior::className(),
+                'allevents' => [ActiveRecord::EVENT_AFTER_FIND],
+                'action' => function($event) {
+                    /** @var \yii\base\Event $event */
+                    $model = $event->sender;
+                    $model->_oldFlag = $model->ord_flag;
+                }
+            ],
+            [
+                'class' => ActionBehavior::className(),
+                'allevents' => [ActiveRecord::EVENT_AFTER_UPDATE],
+                'action' => function($event) {
+                    /** @var \yii\base\Event $event */
+                    $model = $event->sender;
+                    $old = $model->_oldFlag;
+                    $new = $model->ord_flag;
+                    if( ($old != $new) && ($new == Userorder::ORDER_FLAG_COMPLETED) ) {
+                        $aUsers = User::findAll(['us_group' => [User::GROUP_ADMIN, User::GROUP_OPERATOR,] ]);
+                        $oNotify = new Notificator(
+                            $aUsers,
+                            $model,
+                            'ordermade_mail'
+                        );
+                        $oNotify->notifyMail('Новый заказ на сайте "' . Yii::$app->name . '"');
+                    }
+                }
             ],
         ];
     }
@@ -55,7 +91,8 @@ class Userorder extends ActiveRecord
             [['ord_us_id', 'ord_flag', ], 'integer'],
             [['ord_id'], 'integer', 'skipOnEmpty'=>true],
             [['ord_summ'], 'number'],
-            [['ord_created'], 'safe']
+            [['ord_created'], 'safe'],
+            [['ord_message'], 'string', 'max' => 5000],
         ];
     }
 
@@ -71,6 +108,7 @@ class Userorder extends ActiveRecord
             'ord_flag' => 'Состояние',
             'ord_created' => 'Создан',
             'items' => 'Состав',
+            'ord_message' => 'Сообщение',
         ];
     }
 

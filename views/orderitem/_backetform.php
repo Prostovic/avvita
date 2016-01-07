@@ -54,6 +54,7 @@ if( $showedit ) {
             ?>
             <th>Баллы</th>
             <th>Сумма</th>
+            <th></th>
             <?php
 //                }
             ?>
@@ -104,6 +105,15 @@ foreach($items As $obItem) {
             echo $nc;
             ?>
         </td>
+        <td>
+            <?php
+            if( $showedit ) {
+                echo Html::a('<span class="glyphicon glyphicon-remove"></span>', '#', ['class'=>'btn btn-danger deleterow']);
+            }
+            ?>
+
+        </td>
+
     </tr>
 <?php
 }
@@ -119,6 +129,7 @@ foreach($items As $obItem) {
                 echo $nSumm;
                 ?>
             </td>
+            <td></td>
         </tr>
 
         </tbody>
@@ -137,6 +148,7 @@ if( $showedit ) {
     <div class="form-group">
 <?php
     echo Html::submitButton('Сохранить', ['class' => 'btn btn-success']);
+    echo Html::submitButton('Оформить', ['class' => 'btn btn-success', 'value'=>'confirm', 'name'=>'confirm']);
 ?>
     </div>
 <?php
@@ -182,6 +194,18 @@ jQuery(".countminus, .countplus")
             else {
                 fChangeCount(oInp, 1);
             }
+            oInp.trigger("change");
+            return false;
+        }
+    );
+jQuery(".deleterow")
+    .on(
+        "click",
+        function(event){
+            event.preventDefault();
+            var oRow = jQuery(this).parents("tr:first"), oInp = oRow.find("input:first");
+            oInp.val(0);
+            oRow.hide();
             oInp.trigger("change");
             return false;
         }

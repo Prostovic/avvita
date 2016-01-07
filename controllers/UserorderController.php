@@ -98,11 +98,68 @@ class UserorderController extends Controller
         }
 
         if( Yii::$app->request->isPost && ($model->ord_flag == Userorder::ORDER_FLAG_ACTVE) ) {
-            $this->validateOrder($model, false);
+            Orderhelper::validateOrder($model);
+            if( count(Orderhelper::getOrderErrors($model)) == 0 ) {
+                //
+                if( $model->save() ) {
+                    foreach($model->goods As $obItem) {
+                        /** @var Orderitem $obItem */
+                        if( $obItem->ordit_count < 1 ) {
+                            $obItem->ordit_count = 0;
+                            $obItem->ordit_gd_id = 0;
+                            $obItem->ordit_ord_id = 0;
+                        }
+                        $obItem->save();
+                    }
+                    if( isset($_POST['confirm']) ) {
+                        $this->redirect(['confirm', 'id'=>$id]);
+                    }
+                    else {
+                        $this->refresh();
+                    }
+                }
+            }
         }
 
         return $this->render('view', [
             'model' => $model,
+        ]);
+    }
+
+    /**
+     *
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionConfirm($id)
+    {
+        $model = $this->findModel($id, ['goods']);
+
+        if( !Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+            if( ($model === null) || (Yii::$app->user->getId() != $model->ord_us_id) ) {
+                throw new ForbiddenHttpException('Вы не можете просматривать данный заказ');
+            }
+        }
+
+        if( Yii::$app->request->isPost && ($model->ord_flag == Userorder::ORDER_FLAG_ACTVE) ) {
+            Orderhelper::validateOrder($model, false);
+            if( count(Orderhelper::getOrderErrors($model)) == 0 ) {
+                $model->ord_flag = Userorder::ORDER_FLAG_COMPLETED;
+                $model->ord_message = $_POST[$model->formName()]['ord_message'];
+                $nSumm = 0;
+                foreach($model->goods As $obItem) {
+                    /** @var Orderitem $obItem */
+                    $nSumm += $obItem->ordit_count * $obItem->good->gd_price;
+                }
+                $model->ord_summ = $nSumm;
+                if( $model->save() ) {
+                    $this->redirect(['list']);
+                }
+            }
+        }
+
+        return $this->render('_confirmform', [
+            'order' => $model,
         ]);
     }
 

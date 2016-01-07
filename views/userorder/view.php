@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\models\Userorder;
 
 use app\models\User;
 use app\models\Orderitem;
@@ -95,7 +96,7 @@ if( $bOperator ) {
         [
             'order' => $model,
             'items' => $model->goods,
-            'showedit' => $bClient && ($model->ord_us_id == Yii::$app->user->getId()),
+            'showedit' => $bClient && ($model->ord_us_id == Yii::$app->user->getId()) && ($model->ord_flag == Userorder::ORDER_FLAG_ACTVE),
         ]
     ) ?>
 
