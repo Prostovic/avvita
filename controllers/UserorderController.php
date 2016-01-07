@@ -35,17 +35,17 @@ class UserorderController extends Controller
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'update', 'delete', 'list', 'append', ], // 'view', 'delete',
+                'only' => ['index', 'update', 'delete', 'list', 'append', 'view', ], // 'view', 'delete',
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['list', 'append', 'update', ],
+                        'actions' => ['list', 'append', 'update', 'view', ],
                         'roles' => [ User::GROUP_CLIENT, ],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['index', 'update', 'delete', ],
-                        'roles' => [User::GROUP_OPERATOR],
+                        'actions' => ['index', 'update', 'delete', 'view', ],
+                        'roles' => [ User::GROUP_OPERATOR ],
                     ],
                 ],
             ],
@@ -161,6 +161,53 @@ class UserorderController extends Controller
         return $this->render('_confirmform', [
             'order' => $model,
         ]);
+    }
+
+    /**
+     *
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionSend($id) {
+        if( !Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+            throw new ForbiddenHttpException('Вы не можете изменять данный заказ');
+        }
+
+        $model = $this->findModel($id, ['goods']);
+
+        if( Yii::$app->request->isPost && ($model->ord_flag == Userorder::ORDER_FLAG_COMPLETED) ) {
+            $model->ord_flag = Userorder::ORDER_FLAG_SENDED;
+            $model->save();
+        }
+        $this->redirect(['index']);
+    }
+
+    /**
+     *
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionToedit($id)
+    {
+        if( !Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+            throw new ForbiddenHttpException('Вы не можете изменять данный заказ');
+        }
+
+        $model = $this->findModel($id, ['goods']);
+        $nCou = Yii::$app
+            ->db
+            ->createCommand(
+                'Select COUNT(*) As couactive From ' . Userorder::tableName()
+                . ' Where ord_us_id = ' . $model->ord_us_id . ' And ord_flag = ' . Userorder::ORDER_FLAG_ACTVE
+            )
+            ->queryScalar();
+
+        if( Yii::$app->request->isPost && ($model->ord_flag == Userorder::ORDER_FLAG_COMPLETED) And ($nCou == 0) ) {
+            $model->ord_flag = Userorder::ORDER_FLAG_ACTVE;
+            $model->ord_summ = 0;
+            $model->save();
+        }
+        $this->redirect(['index']);
     }
 
     /**

@@ -15,6 +15,9 @@ use app\models\Orderitem;
 $this->title = 'Заказы';
 $this->params['breadcrumbs'][] = $this->title;
 
+$bClient = Yii::$app->user->can(User::GROUP_CLIENT);
+$bOperator = Yii::$app->user->can(User::GROUP_OPERATOR);
+
 $columns = [];
 $columns = array_merge(
     $columns,
@@ -51,7 +54,38 @@ $columns = array_merge(
         ],
     //    'ord_created',
 
-        ['class' => 'yii\grid\ActionColumn'],
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'template' => '{view}' . ($bClient ? ' {delete}' : '') . ($bOperator ? ' {toedit} {send}' : ''),
+            'buttons' => [
+                'send' => function ($url, $model, $key) {
+                    /** @var Userorder $model */
+                    $options = [
+                        'title' => 'Отметить отправленным',
+                        'aria-label' => 'Отметить отправленным',
+                        'data-confirm' => 'Отметить данный заказ отправленным?',
+                        'data-method' => 'post',
+                        'data-pjax' => '0',
+                    ];
+                    return ($model->ord_flag == Userorder::ORDER_FLAG_COMPLETED) ?
+                        Html::a('<span class="glyphicon glyphicon-ok"></span>', $url, $options) :
+                        '';
+                },
+                'toedit' => function ($url, $model, $key) {
+                    /** @var Userorder $model */
+                    $options = [
+                        'title' => 'Вернуть клиенту',
+                        'aria-label' => 'Вернуть клиенту',
+                        'data-confirm' => 'Вернуть данный заказ клиенту?',
+                        'data-method' => 'post',
+                        'data-pjax' => '0',
+                    ];
+                    return ($model->ord_flag == Userorder::ORDER_FLAG_COMPLETED) ?
+                        Html::a('<span class="glyphicon glyphicon-refresh"></span>', $url, $options) :
+                        '';
+                },
+            ],
+        ],
     ]
 );
 
@@ -61,7 +95,7 @@ $columns = array_merge(
 //    . '<br />';
 
 
-if( Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+if( $bOperator ) {
     array_splice(
         $columns,
         1,
