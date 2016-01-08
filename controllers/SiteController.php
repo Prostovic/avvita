@@ -6,9 +6,12 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
+
 use app\models\User;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\GoodSearch;
 
 class SiteController extends Controller
 {
@@ -50,7 +53,15 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        return $this->render('index');
+        $searchModel = new GoodSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        Url::remember();
+
+        return $this->render('//good/userindex', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+//        return $this->render('index');
     }
 
     public function actionLogin()

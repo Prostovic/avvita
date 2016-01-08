@@ -8,9 +8,19 @@ $sfWebLocal = __DIR__ . DIRECTORY_SEPARATOR . 'web-local.php';
 
 $config = [
     'id' => 'app',
-    'language' => 'ru',
+    'language' => 'ru-RU',
     'name' => 'Аввита бонус-портал',
+    'defaultRoute' => 'site/index',
     'components' => [
+        'view' => [
+            'theme' => [
+                'basePath' => '@app/themes/theme01',
+                'baseUrl' => '@web/theme01',
+                'pathMap' => [
+                    '@app/views' => '@app/themes/theme01',
+                ],
+            ],
+        ],
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
