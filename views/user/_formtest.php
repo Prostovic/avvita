@@ -13,21 +13,10 @@ use kartik\select2\Select2;
 /* @var $model app\models\User */
 /* @var $form yii\widgets\ActiveForm */
 
-$this->title = 'Проверка данных пользователя';
-// $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
-// $this->params['breadcrumbs'][] = ['label' => $model->us_id, 'url' => ['view', 'id' => $model->us_id]];
-$this->params['breadcrumbs'][] = $this->title;
+if( preg_match('|([\\d]+)\\-([\\d]+)\\-([\\d]+)|', $model->us_birth, $a) ) {
+    $model->us_birth = date('d.m.Y', strtotime($model->us_birth));
+}
 
-$model->us_group = User::GROUP_CLIENT;
-
-echo $this->render(
-    '_formtest',
-    [
-        'model' => $model,
-    ]
-);
-
-/*
 ?>
 
 <div class="user-form">
@@ -114,44 +103,6 @@ echo $this->render(
 
     <div class="clearfix"></div>
 
-    <?= '' // $form->field($model, 'us_active')->textInput() ?>
-
-    <?= '' // $form->field($model, 'us_fam')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_name')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_otch')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_email')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_phone')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_adr_post')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_birth')->textInput() ?>
-
-    <?= '' // $form->field($model, 'us_pass')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_position')->textInput() ?>
-
-    <?= '' // $form->field($model, 'us_city')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_org')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_city_id')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_org_id')->textInput(['maxlength' => true]) ?>
-
-    <?= '' // $form->field($model, 'us_created')->textInput() ?>
-
-    <?= '' // $form->field($model, 'us_confirm')->textInput() ?>
-
-    <?= '' // $form->field($model, 'us_activate')->textInput() ?>
-
-    <?= '' // $form->field($model, 'us_getnews')->textInput() ?>
-
-    <?= '' // $form->field($model, 'us_getstate')->textInput() ?>
-
     <div class="form-group col-md-3">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
@@ -160,4 +111,3 @@ echo $this->render(
     <?php ActiveForm::end(); ?>
 
 </div>
-*/

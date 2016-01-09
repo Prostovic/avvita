@@ -3,14 +3,21 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\MaskedInput;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 /* @var $form yii\widgets\ActiveForm */
+
+if( preg_match('|([\\d]+)\\-([\\d]+)\\-([\\d]+)|', $model->us_birth, $a) ) {
+    $model->us_birth = date('d.m.Y', strtotime($model->us_birth));
+}
+
+$bClientForm = ($model->us_group != User::GROUP_OPERATOR) && ($model->us_group != User::GROUP_ADMIN);
+
 ?>
 
 <div class="user-form">
-
     <?php $form = ActiveForm::begin([
         'id' => 'register-form',
         'options' => [
@@ -38,7 +45,7 @@ use yii\widgets\MaskedInput;
 
     <?= $form->field($model, 'us_otch')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_otch')]) ?>
 
-    <?= $form->field($model, 'us_position')->dropDownList($model->getPositions(), ['placeholder' => $model->getAttributeLabel('us_position')]) ?>
+    <?= $bClientForm ? $form->field($model, 'us_position')->dropDownList($model->getPositions(), ['placeholder' => $model->getAttributeLabel('us_position')]) : '' ?>
 
     <div class="clearfix"></div>
 
@@ -61,11 +68,11 @@ use yii\widgets\MaskedInput;
 
     <div class="clearfix"></div>
 
-    <?= $form->field($model, 'us_city')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_city')]) ?>
+    <?= $bClientForm ? $form->field($model, 'us_city')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_city')]) : '' ?>
 
-    <?= $form->field($model, 'us_org')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_org')]) ?>
+    <?= $bClientForm ? $form->field($model, 'us_org')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_org')]) : '' ?>
 
-    <?= $form->field($model, 'us_adr_post', ['options' => ['class' => 'form-group col-md-6'],])->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_adr_post')]) ?>
+    <?= $bClientForm ? $form->field($model, 'us_adr_post', ['options' => ['class' => 'form-group col-md-6'],])->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_adr_post')]) : '' ?>
 
     <?php if( false ): ?>
 
@@ -75,6 +82,7 @@ use yii\widgets\MaskedInput;
 
     <?php endif; ?>
 
+    <?php if( $model->isNewRecord ): ?>
     <div class="clearfix"></div>
 
     <?= $form->field($model, 'us_getnews', ['options' => ['class' => 'form-group col-md-12'],])->checkbox(['label' => 'Получать информацию об акциях компании Аввита']) ?>
@@ -82,6 +90,7 @@ use yii\widgets\MaskedInput;
     <?= $form->field($model, 'us_getstate', ['options' => ['class' => 'form-group col-md-12'],])->checkbox(['label' => 'Получать информацию об изменении бонусных баллов']) ?>
 
     <?= $form->field($model, 'isAgree', ['options' => ['class' => 'form-group col-md-12'],])->checkbox(['label' => $model->getAttributeLabel('isAgree')]) ?>
+    <?php endif; ?>
 
     <div class="clearfix"></div>
 

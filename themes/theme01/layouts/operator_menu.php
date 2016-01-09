@@ -77,7 +77,11 @@ echo Nav::widget([
             ],
         ],
         [
-            'label' => 'Выход (' . Yii::$app->user->identity->username . ')',
+            'label' => 'Профиль',
+            'url' => ['user/profile', ], // 'id' => Yii::$app->user->getId(),
+        ],
+        [
+            'label' => 'Выход', // (' . Yii::$app->user->identity->username . ')',
             'url' => ['/site/logout'],
             'linkOptions' => ['data-method' => 'post']
         ],

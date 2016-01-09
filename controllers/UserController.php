@@ -6,6 +6,7 @@ use Yii;
 use yii\base\InvalidCallException;
 use yii\db\Expression;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\widgets\ActiveForm;
@@ -34,11 +35,16 @@ class UserController extends Controller
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'view', 'confirmemail', 'register', 'testuserdata', ],
+                'only' => ['index', 'view', 'confirmemail', 'register', 'testuserdata', 'update', 'profile'],
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'view', 'testuserdata', ],
+                        'actions' => ['profile', ],
+                        'roles' => [User::GROUP_CLIENT],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', 'testuserdata', 'update', 'profile', ],
                         'roles' => [User::GROUP_OPERATOR],
                     ],
                     [
@@ -136,7 +142,7 @@ class UserController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->us_id]);
+            return $this->redirect(['user/index', ]); // 'id' => $model->us_id
 //            return $this->redirect(['view', 'id' => $model->us_id]);
         } else {
             return $this->render('testuser', [
@@ -196,12 +202,22 @@ class UserController extends Controller
     }
 
     /**
+     * Updates an User profile.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionProfile() {
+        return $this->actionUpdate(Yii::$app->user->getId(), 'profile');
+    }
+
+    /**
      * Updates an existing User model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id, $scenario = null)
     {
         $bNew = false;
         if( $id == 0 ) {
@@ -212,6 +228,20 @@ class UserController extends Controller
         }
         else {
             $model = $this->findModel($id);
+            if( Yii::$app->user->can(User::GROUP_CLIENT) ) {
+                if( Yii::$app->user->getId() != $model->us_id ) {
+                    throw new ForbiddenHttpException('У Вас нет прав для доступа к этой странице');
+                }
+                $model->scenario = 'profile';
+            }
+            else {
+                if( $scenario !== null ) {
+                    $model->scenario = $scenario;
+                }
+                else {
+                    $model->scenario = ($model->us_group == User::GROUP_OPERATOR) || ($model->us_group == User::GROUP_ADMIN) ? 'profile' : 'testUserData';
+                }
+            }
         }
 
         if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
@@ -226,13 +256,20 @@ class UserController extends Controller
                 ]);
             }
             else {
-                return $this->redirect(['view', 'id' => $model->us_id]);
+                if( Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+                    return $this->redirect(['index', ]);
+//                    return $this->redirect(['view', 'id' => $model->us_id]);
+                }
+                else {
+                    Yii::$app->session->setFlash('success', 'Данные успешно сохранены');
+                    return $this->refresh();
+                }
             }
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
         }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
     }
 
     /**

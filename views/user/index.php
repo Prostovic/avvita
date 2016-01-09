@@ -10,7 +10,7 @@ use app\models\User;
 /* @var $searchModel app\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Users';
+$this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-index">

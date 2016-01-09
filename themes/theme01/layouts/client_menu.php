@@ -72,6 +72,10 @@ echo Nav::widget([
             ],
         ],
         [
+            'label' => 'Профиль',
+            'url' => ['user/profile', ], // 'id' => Yii::$app->user->getId(),
+        ],
+        [
             'label' => $sActive,
             'url' => $aActiveLink,
             'encode' => false,

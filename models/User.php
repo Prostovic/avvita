@@ -247,6 +247,28 @@ class User extends ActiveRecord implements IdentityInterface
             'isAgree',
         ];
 
+        $aRet['profile'] = [ // профиль
+            'us_fam',
+            'us_name',
+            'us_otch',
+            'us_email',
+            'us_phone',
+            'password',
+            'us_birth',
+        ];
+
+        if( ($this->scenario == 'profile') && !Yii::$app->user->can(self::GROUP_OPERATOR) ) {
+            $aRet['profile'] = array_merge(
+                $aRet['profile'],
+                [
+                    'us_adr_post',
+                    'us_position',
+                    'us_city',
+                    'us_org',
+                ]
+            );
+        }
+
         $aRet['confirmUserEmail'] = [ // проверка email
             'us_group',
         ];
