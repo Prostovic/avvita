@@ -30,7 +30,7 @@ $columns = array_merge(
         [
             'class' => 'yii\grid\DataColumn',
             'attribute' => 'ord_flag',
-            'filter' => Userorder::getOrderStates(),
+            'filter' => $bClient ? false : Userorder::getOrderStates(),
             'value' => function ($model, $key, $index, $column) {
                 /** @var Userorder $model */
                 return Html::encode($model->getStatetitle());
@@ -56,7 +56,7 @@ $columns = array_merge(
 
         [
             'class' => 'yii\grid\ActionColumn',
-            'template' => '{view}' . ($bClient ? ' {delete}' : '') . ($bOperator ? ' {toedit} {send}' : ''),
+            'template' => '{view}' . ($bOperator ? ' {toedit} {send}' : ''), //  . ($bClient ? ' {delete}' : '')
             'buttons' => [
                 'send' => function ($url, $model, $key) {
                     /** @var Userorder $model */
@@ -129,7 +129,7 @@ if( $bOperator ) {
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
+        'filterModel' => $bClient ? null : $searchModel,
         'columns' => $columns,
     ]); ?>
 

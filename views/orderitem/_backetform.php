@@ -30,7 +30,7 @@ if( $showedit ) {
                         . '{input}'
                         . '<a class="btn btn-success countplus" href="#" style="float: left;"><span class="glyphicon glyphicon-plus"></span></a>'
                         . "<div class=\"clearfix\"></div>\n{error}",
-            'options' => ['class' => 'form-group col-md-6'],
+            'options' => ['class' => '', 'style' => 'width: 240px;'],
             'labelOptions'=>['class'=>'control-label col-md-6'],
         ],
         'validationUrl' => ['userorder/validate', 'id' =>$order->ord_id],
@@ -49,14 +49,12 @@ if( $showedit ) {
         <tr>
             <th>Нименование</th>
             <th>Кол-во</th>
-            <?php
-//                if( !$showedit ) {
-            ?>
             <th>Баллы</th>
             <th>Сумма</th>
-            <th></th>
             <?php
-//                }
+            if( $showedit ) {
+                echo '<th></th>';
+            }
             ?>
         </tr>
         </thead>
@@ -105,15 +103,11 @@ foreach($items As $obItem) {
             echo $nc;
             ?>
         </td>
-        <td>
-            <?php
+        <?php
             if( $showedit ) {
-                echo Html::a('<span class="glyphicon glyphicon-remove"></span>', '#', ['class'=>'btn btn-danger deleterow']);
+                echo '<td>' . Html::a('<span class="glyphicon glyphicon-remove"></span>', '#', ['class'=>'btn btn-danger deleterow']) . '</td>';
             }
-            ?>
-
-        </td>
-
+        ?>
     </tr>
 <?php
 }
@@ -121,7 +115,7 @@ foreach($items As $obItem) {
 
 ?>
         <tr>
-            <td></td>
+            <td><strong>Итого</strong></td>
             <td></td>
             <td class="text-right"></td>
             <td class="text-right comm_value">
@@ -129,7 +123,11 @@ foreach($items As $obItem) {
                 echo $nSumm;
                 ?>
             </td>
-            <td></td>
+            <?php
+                if( $showedit ) {
+                    echo '<td></td>';
+                }
+            ?>
         </tr>
 
         </tbody>
@@ -147,7 +145,7 @@ if( $showedit ) {
     <div class="clearfix"></div>
     <div class="form-group">
 <?php
-    echo Html::submitButton('Сохранить', ['class' => 'btn btn-success']);
+    echo Html::submitButton('Сохранить', ['class' => 'btn btn-success']) . ' ';
     echo Html::submitButton('Оформить', ['class' => 'btn btn-success', 'value'=>'confirm', 'name'=>'confirm']);
 ?>
     </div>

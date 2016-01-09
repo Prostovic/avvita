@@ -97,6 +97,7 @@ class Userdata extends \yii\db\ActiveRecord
             'ud_created' => 'Создан',
             'ud_doc_key' => 'Номер заказа',
             'docsumm' => 'Сумма баллов',
+            'docs' => 'Состав',
         ];
     }
 

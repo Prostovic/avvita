@@ -47,6 +47,11 @@ class UserorderSearch extends Userorder
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> [
+                'defaultOrder' => [
+                    'ord_id'=>SORT_DESC,
+                ],
+            ],
         ]);
 
         $this->load($params);
@@ -54,6 +59,9 @@ class UserorderSearch extends Userorder
         $oUser = Yii::$app->user;
         if( !$oUser->can(User::GROUP_ADMIN) && !$oUser->can(User::GROUP_OPERATOR) ) {
             $this->ord_us_id = $oUser->getId();
+            $query->andFilterWhere([
+                'not in', 'ord_flag', [self::ORDER_FLAG_ACTVE]
+            ]);
         }
 
         if (!$this->validate()) {

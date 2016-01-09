@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="form-group">
             <div class="col-lg-offset-1 col-lg-11">
-                <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                <?= Html::submitButton('Вход', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
             </div>
         </div>
 
@@ -48,5 +48,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 */
     ?>
+
+    <div class="col-lg-offset-1" style="color:#999;">
+        <?= Html::a('Восстановить пароль', ['site/restore'], ['class' => '', ]) ?>
+    </div>
 
 </div>

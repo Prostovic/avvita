@@ -146,6 +146,34 @@ class UserController extends Controller
     }
 
     /**
+     * New user registration
+     * @return mixed
+     */
+    public function actionRestorepass()
+    {
+        $model = User::findByOpkey(Yii::$app->request->getQueryParam('key', 'nokey'));
+
+        if( $model === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $model->scenario = 'setnewpassword';
+
+        if( $model->load(Yii::$app->request->post()) ) {
+            $model->us_op_key = '';
+            if( $model->save() ) {
+                Yii::$app->session->setFlash('success', 'Новый пароль установлен');
+            }
+//            return $this->redirect(['view', 'id' => $model->us_id]);
+//            return $this->redirect(['view', 'id' => $model->us_id]);
+        }
+
+        return $this->render('newpasswordform', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
      * Creates a new User model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed

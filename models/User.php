@@ -38,6 +38,7 @@ use app\components\Notificator;
  * @property string $us_key
  * @property integer $us_getnews
  * @property integer $us_getstate
+ * @property string $us_op_key
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -176,7 +177,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['us_fam', 'us_name', 'us_otch', 'us_city', ], 'app\components\CapitalizeFilter'],
             [['isAgree', ], 'required', 'on' => ['register']],
             [['isAgree', ], 'compare', 'compareValue' => 1, 'message' => 'Необходимо отметить {attribute}', 'on' => ['register']],
-            [['password', ], 'required', 'on'=>['register']],
+            [['password', ], 'required', 'on'=>['register', 'setnewpassword', ]],
             [['us_active', 'us_position', 'us_getnews', 'us_getstate', 'us_city_id', 'us_org_id', ], 'integer'],
             [['us_birth', 'us_created', 'us_confirm', 'us_activate'], 'safe'],
             [['us_fam', 'us_name', 'us_otch'], 'string', 'max' => 32],
@@ -187,7 +188,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['us_group'], 'in', 'range' => array_keys(self::getGroups()), ],
             [['us_phone'], 'string', 'max' => 24],
             [['us_phone'], 'match', 'pattern' => '|\\+[\\d]+\\([\\d]+\\)[-\\d]{7,9}|'],
-            [['us_adr_post', 'us_pass', 'us_city', 'us_org'], 'string', 'max' => 255],
+            [['us_adr_post', 'us_pass', 'us_city', 'us_org', 'us_op_key', ], 'string', 'max' => 255],
             [['us_group'], 'string', 'max' => 16]
         ];
     }
@@ -221,6 +222,7 @@ class User extends ActiveRecord implements IdentityInterface
             'us_getstate' => 'Инф. о бонусах',
             'us_group' => 'Группа',
             'isAgree' => 'Согласие на обработку данных',
+            'us_op_key' => 'Ключ на действия',
         ];
     }
 
@@ -247,6 +249,10 @@ class User extends ActiveRecord implements IdentityInterface
 
         $aRet['confirmUserEmail'] = [ // проверка email
             'us_group',
+        ];
+
+        $aRet['setnewpassword'] = [ // новый пароль
+            'password',
         ];
 
         $aRet['testUserData'] = [ // проверка пользователя админом
@@ -348,6 +354,17 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findByUsername($username)
     {
         return self::findOne(['us_email' => $username]);
+    }
+
+    /**
+     * Finds user by us_op_key
+     *
+     * @param  string      $username
+     * @return static|null
+     */
+    public static function findByOpkey($opkey)
+    {
+        return self::findOne(['us_op_key' => $opkey]);
     }
 
     /**

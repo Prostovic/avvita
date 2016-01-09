@@ -53,7 +53,10 @@ $columns[] = [
     }
 ];
 
-$columns[] = ['class' => 'yii\grid\ActionColumn'];
+$columns[] = [
+    'class' => 'yii\grid\ActionColumn',
+    'template' => '{view}' . ($bOperator ? ' {delete}' : ''),
+];
 
 ?>
 <div class="userdata-index">

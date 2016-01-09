@@ -9,6 +9,7 @@ use app\models\UserdataSearch;
 use app\models\OrderForm;
 
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -76,8 +77,15 @@ class UserdataController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
+        if( !Yii::$app->user->can(User::GROUP_OPERATOR)
+         && ($model->ud_us_id != Yii::$app->user->getId()) ) {
+            throw new ForbiddenHttpException('У Вас нет доступа к данной странице');
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 

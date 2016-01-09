@@ -78,7 +78,7 @@ class Docdata extends \yii\db\ActiveRecord
             'doc_org_id' => 'Организация',
             'doc_title' => 'Нименование',
             'doc_number' => 'Кол-во',
-            'doc_summ' => 'Сумма',
+            'doc_summ' => 'Баллы',
             'doc_created' => 'Создан',
         ];
     }

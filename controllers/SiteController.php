@@ -10,6 +10,7 @@ use yii\helpers\Url;
 
 use app\models\User;
 use app\models\LoginForm;
+use app\models\RestoreForm;
 use app\models\ContactForm;
 use app\models\GoodSearch;
 
@@ -89,6 +90,31 @@ class SiteController extends Controller
         Yii::$app->user->logout();
 
         return $this->goHome();
+    }
+
+    public function actionRestore()
+    {
+        if (!\Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new RestoreForm();
+        if( $model->load(Yii::$app->request->post()) ) {
+            if( $model->validate() ) {
+                if( $model->createResetData() ) {
+                    Yii::$app->session->setFlash('success', 'На Ваш адрес выслано письмо с указанием дальнйших действий по восстановлению пароля');
+                }
+                else {
+                    Yii::$app->session->setFlash('danger', 'К сожалению');
+                }
+            }
+            else {
+                usleep(1000000);
+            }
+        }
+        return $this->render('restore', [
+            'model' => $model,
+        ]);
     }
 
     public function actionContact()
