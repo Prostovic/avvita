@@ -73,6 +73,8 @@ echo Nav::widget([
                 '<li class="divider"></li>',
                 ['label' => 'Заказы', 'url' => ['import/data']],
                 '<li class="dropdown-header">XML файл</li>',
+                ['label' => 'Email', 'url' => ['email/index']],
+                '<li class="dropdown-header">Файлы email</li>',
 //                '<li class="divider"></li>',
             ],
         ],
