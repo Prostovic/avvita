@@ -111,6 +111,7 @@ class UserorderController extends Controller
                         }
                         $obItem->save();
                     }
+                    Orderhelper::getActiveOrderData(true);
                     if( isset($_POST['confirm']) ) {
                         $this->redirect(['confirm', 'id'=>$id]);
                     }
@@ -153,6 +154,7 @@ class UserorderController extends Controller
                 }
                 $model->ord_summ = $nSumm;
                 if( $model->save() ) {
+                    Orderhelper::getActiveOrderData(true);
                     $this->redirect(['list']);
                 }
             }
@@ -246,6 +248,7 @@ class UserorderController extends Controller
                 'model' => $model,
             ]);
         }
+        Orderhelper::getActiveOrderData(true);
 
         return $this->goBack();
     }

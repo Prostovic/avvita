@@ -24,6 +24,8 @@ class Orderhelper {
     const CALC_TYPE_USED = 1; // баллы в выполненных заказах
     const CALC_TYPE_BOTH = 2; // итоговая сумма - разность между начисленными и потраченными балами в выполненных заказах
 
+    const ACTIVE_ORDER_DATA_KEY = 'active_order_data'; // ключ данных по активному заказу
+
     /**
      * @param Userorder $model
      * @param integer $id good id
@@ -239,6 +241,11 @@ class Orderhelper {
         return $result;
     }
 
+    /**
+     * @param integer $val
+     * @param string $sFormat
+     * @return string
+     */
     public static function prepareWord($val, $sFormat) {
         $sRet = $sFormat;
         if( preg_match_all('/(=[\\d+]|one|few|many|other)\\{([^\\}]+)\\}/U', $sFormat, $a) ) {
@@ -266,5 +273,57 @@ class Orderhelper {
             }
         }
         return $sRet;
+    }
+
+    /**
+     * @param boolean $bRecalc
+     * @return array
+     */
+    public static function getActiveOrderData($bRecalc = false) {
+        if( $bRecalc || !Yii::$app->session->has(self::ACTIVE_ORDER_DATA_KEY) ) {
+            Yii::$app->session->set(
+                self::ACTIVE_ORDER_DATA_KEY,
+                self::calcActiveData()
+            );
+        }
+        return Yii::$app->session->get(self::ACTIVE_ORDER_DATA_KEY);
+    }
+
+    /**
+     * $param integer $uid
+     * @return array
+     */
+    public static function calcActiveData($uid = null) {
+        if( $uid === null ) {
+            $uid = Yii::$app->user->getId();
+        }
+        $orderQuery = (new Query())
+            ->select('ord_id')
+            ->from(Userorder::tableName())
+            ->where([
+                'ord_us_id' => $uid,
+                'ord_flag' => Userorder::ORDER_FLAG_ACTVE
+            ]);
+
+        $items = Orderitem::find()
+            ->where(['ordit_ord_id' => $orderQuery,])
+            ->with(['good'])
+            ->all();
+        $nCou = 0;
+        $nSumm = 0;
+        $id = 0;
+        foreach( $items as &$obItem) {
+            /** @var Orderitem $obItem */
+            $id = $obItem->ordit_ord_id;
+            $nCou++;
+            $nSumm += $obItem->ordit_count * $obItem->good->gd_price;
+            Yii::info('calcActiveData(): ' . $obItem->ordit_id . ' ' . $nCou . '/' . $nSumm);
+        }
+        return [
+            'activeorder' => $id,
+            'goodcount' => $nCou,
+            'summ' => $nSumm,
+            'available' => self::calculateUserMoney(Yii::$app->user->getId(), self::CALC_TYPE_BOTH),
+        ];
     }
 }

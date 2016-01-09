@@ -12,7 +12,8 @@ use app\models\Orderitem;
 
 $bOperator = Yii::$app->user->can(User::GROUP_OPERATOR);
 $bClient = Yii::$app->user->can(User::GROUP_CLIENT);
-$this->title = 'Заказ ' . $model->ord_id;
+$this->title = 'Заказ подарков '
+    . (($model->ord_flag != Userorder::ORDER_FLAG_ACTVE) || $bOperator ? $model->ord_id : '');
 $this->params['breadcrumbs'][] = ['label' => 'Заказы', 'url' => [$bOperator ? 'index' : 'list']];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -91,7 +92,7 @@ if( $bOperator ) {
         <p><?php echo Html::encode($model->user->getUserName()); ?></p>
     <?php } ?>
 
-    <?php echo $this->render(
+    <?php echo (count($model->goods) == 0) ? '<p>Пока подарков не выбрано</p>' : $this->render(
         '//orderitem/_backetform',
         [
             'order' => $model,

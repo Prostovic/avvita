@@ -506,3 +506,10 @@ h3 {
     border: 1px solid #cc5a00;
     color: #fff;
 }
+
+.countitems {
+    padding: 4px;
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    white-space: nowrap;
+}

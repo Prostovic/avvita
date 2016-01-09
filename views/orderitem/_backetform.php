@@ -145,8 +145,10 @@ if( $showedit ) {
     <div class="clearfix"></div>
     <div class="form-group">
 <?php
-    echo Html::submitButton('Сохранить', ['class' => 'btn btn-success']) . ' ';
-    echo Html::submitButton('Оформить', ['class' => 'btn btn-success', 'value'=>'confirm', 'name'=>'confirm']);
+    if( $nSumm > 0 ) {
+        echo Html::submitButton('Сохранить', ['class' => 'btn btn-success']) . ' ';
+        echo Html::submitButton('Оформить', ['class' => 'btn btn-success', 'value'=>'confirm', 'name'=>'confirm']);
+    }
 ?>
     </div>
 <?php

@@ -9,6 +9,7 @@
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
+use app\components\Orderhelper;
 
 NavBar::begin([
     'brandLabel' => Yii::$app->name,
@@ -17,6 +18,25 @@ NavBar::begin([
         'class' => 'navbar-inverse navbar-fixed-top',
     ],
 ]);
+
+$aActiveData = Orderhelper::getActiveOrderData();
+$sActive = '';
+$aActiveLink = '#';
+
+if( $aActiveData['goodcount'] > 0 ) {
+    $sActive = '<span class="countitems">Корзина: '
+        . $aActiveData['goodcount']
+        . ' / '
+        . $aActiveData['summ']
+        . ' '
+        . Orderhelper::prepareWord($aActiveData['summ'], '=0{баллов} =1{балл} one{балл} few{балла} many{баллов} other{баллов}')
+        . '</span> '
+        . ' ';
+    $aActiveLink = ['userorder/view', 'id' => $aActiveData['activeorder']];
+}
+
+$sActive .= 'Баллы: ' . $aActiveData['available'];
+
 echo Nav::widget([
     'options' => ['class' => 'navbar-nav navbar-right'],
     'activateParents' => true,
@@ -52,7 +72,13 @@ echo Nav::widget([
             ],
         ],
         [
-            'label' => 'Выход (' . Yii::$app->user->identity->username . ')',
+            'label' => $sActive,
+            'url' => $aActiveLink,
+            'encode' => false,
+            'active' => false,
+        ],
+        [
+            'label' => 'Выход', //  (' . Yii::$app->user->identity->username . ')',
             'url' => ['/site/logout'],
             'linkOptions' => ['data-method' => 'post']
         ],

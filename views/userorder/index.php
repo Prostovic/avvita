@@ -12,7 +12,7 @@ use app\models\Orderitem;
 /* @var $searchModel app\models\UserorderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Заказы';
+$this->title = 'Выбранные подарки';
 $this->params['breadcrumbs'][] = $this->title;
 
 $bClient = Yii::$app->user->can(User::GROUP_CLIENT);
@@ -116,11 +116,10 @@ if( $bOperator ) {
 //    . '<br />'
 //    . nl2br(str_replace(' ', '&nbsp;', var_export($columns, true)))
 //    . '<br />';
-
+/*     <h1><?= Html::encode($this->title) ?></h1> */
 ?>
 <div class="userorder-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <!-- p>
