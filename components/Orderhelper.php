@@ -238,4 +238,33 @@ class Orderhelper {
 //        Yii::info('getOrderErrors() result = ' . print_r($result, true));
         return $result;
     }
+
+    public static function prepareWord($val, $sFormat) {
+        $sRet = $sFormat;
+        if( preg_match_all('/(=[\\d+]|one|few|many|other)\\{([^\\}]+)\\}/U', $sFormat, $a) ) {
+//            Yii::info('match: ' . print_r($a, true));
+            $aKeys = array_flip($a[1]);
+//            Yii::info('aKeys: ' . print_r($aKeys, true));
+            $nOst = $val % 10;
+            if( isset($aKeys['='.$val]) ) {
+                $sRet = $a[2][$aKeys['='.$val]];
+            }
+            else if( ($val > 1) && ($val < 5) && isset($aKeys['few']) ) {
+                $sRet = $a[2][$aKeys['few']];
+            }
+            else if( ($val > 4) && ($val < 21) && isset($aKeys['many']) ) {
+                $sRet = $a[2][$aKeys['many']];
+            }
+            else if( isset($aKeys['='.$nOst]) ) {
+                $sRet = $a[2][$aKeys['='.$nOst]];
+            }
+            else if( ($nOst > 1) && ($nOst < 5) && isset($aKeys['few']) ) {
+                $sRet = $a[2][$aKeys['few']];
+            }
+            else if( isset($aKeys['other']) ) {
+                $sRet = $a[2][$aKeys['other']];
+            }
+        }
+        return $sRet;
+    }
 }

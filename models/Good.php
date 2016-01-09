@@ -8,6 +8,8 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
 use app\models\Orderitem;
+use app\models\Goodimg;
+use app\components\FilesaveBehavior;
 
 /**
  * This is the model class for table "{{%good}}".
@@ -23,6 +25,8 @@ use app\models\Orderitem;
  */
 class Good extends \yii\db\ActiveRecord
 {
+    public $file = null;
+
     public function behaviors()
     {
         return [
@@ -32,6 +36,19 @@ class Good extends \yii\db\ActiveRecord
                     ActiveRecord::EVENT_BEFORE_INSERT => ['gd_created'],
                 ],
                 'value' => new Expression('NOW()'),
+            ],
+            'fileSave' => [
+                'class' => FilesaveBehavior::className(),
+                'filesaveFileModel' => 'app\models\Goodimg',
+                'filesaveConvertFields' => [
+                    'gi_title' => 'name',
+//                    'file_size' => 'size',
+//                    'file_type' => 'type',
+                    'gi_path' => 'fullpath',
+                    'gi_gd_id' => 'parentid',
+//                    'file_us_id' => Yii::$app->user->getId(),
+                ],
+                'filesaveBaseDirName' => '@webroot/images/gd'
             ],
         ];
     }
@@ -54,8 +71,9 @@ class Good extends \yii\db\ActiveRecord
             [['gd_price'], 'number'],
             [['gd_number', 'gd_active'], 'integer'],
             [['gd_created'], 'safe'],
-            [['gd_title', 'gd_imagepath'], 'string', 'max' => 255]
-        ];
+            [['gd_title', 'gd_imagepath'], 'string', 'max' => 255],
+            [['file'], 'safe'],
+            [['file'], 'file', 'maxFiles' => Yii::$app->params['image.count'], 'maxSize' => Yii::$app->params['image.maxsize'], 'extensions' => Yii::$app->params['image.ext']],        ];
     }
 
     /**
@@ -96,5 +114,17 @@ class Good extends \yii\db\ActiveRecord
         return $this
             ->getItems()
             ->sum('ordit_count');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImages() {
+        return $this->hasMany(
+            Goodimg::className(),
+            [
+                'gi_gd_id' => 'gd_id'
+            ]
+        );
     }
 }

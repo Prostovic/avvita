@@ -3,6 +3,9 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%goodimg}}".
@@ -13,8 +16,23 @@ use Yii;
  * @property string $gi_title
  * @property string $gi_created
  */
-class Goodimg extends \yii\db\ActiveRecord
+class Goodimg extends ActiveRecord
 {
+    /**
+     * @return array
+     */
+    public function behaviors() {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['gi_created'],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -29,7 +47,7 @@ class Goodimg extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['gi_gd_id', 'gi_path', 'gi_created'], 'required'],
+            [['gi_gd_id', 'gi_path', ], 'required'],
             [['gi_gd_id'], 'integer'],
             [['gi_created'], 'safe'],
             [['gi_path', 'gi_title'], 'string', 'max' => 255]

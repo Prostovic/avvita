@@ -7,11 +7,31 @@ use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
-use app\assets\Theme01Asset;
-use app\models\User;
+use yii\web\View;
+
 use yii\bootstrap\Carousel;
 
+use app\assets\Theme01Asset;
+use app\models\User;
+
 Theme01Asset::register($this);
+
+$sJs = <<<EOT
+var fSetNavbar = function() {
+    if ($(".navbar").offset().top > 50) {
+        $(".navbar-fixed-top").addClass("top-nav-collapse");
+    } else {
+        $(".navbar-fixed-top").removeClass("top-nav-collapse");
+    }
+};
+
+$(window).scroll(fSetNavbar);
+fSetNavbar();
+
+EOT;
+
+$this->registerJs($sJs, View::POS_READY);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -180,8 +200,35 @@ Theme01Asset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; <?= Yii::$app->name ?> <?= date('Y') ?></p>
+        <div class="row">
+            <div class="col-footer col-md-4 col-xs-6">
+                <h3>Контакты</h3>
+                <p class="contact-us-details">
+                    <b>Адрес:</b> 107564, Москва, ул. Краснобогатырская, д.2, стр. 3<br>
+                    <b>Телефон:</b> <a href="tel:+74959336291">+7 (495) 933-62-91</a> <br>
+                    <b>Email:</b> <a href="mailto:info@avvita.ru">info@avvita.ru</a>
+                </p>
+            </div>
+            <div class="col-footer col-md-4 col-xs-6">
+                <h3>Наши ресурсы</h3>
+                <p class="contact-us-details">
+                    <b>Сайт:</b> <a href="http://www.avvita.ru/">www.avvita.ru</a><br>
+                </p>
+            </div>
+            <div class="col-footer col-md-4 col-xs-6">
+                <h3>О компании</h3>
+                <p>Оптовая компания « АВВИТА» - крупный российский импортер очковой оптики. Портфель компании представлен широким ассортиментом медицинских оправ, спортивных и солнцезащитных очков производства мировых лидеров оптической индустрии, очковых линз концерна Rodenstock.</p>
+            </div>
 
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="footer-copyright">
+                    &copy; <?= Yii::$app->name ?> <?= date('Y') ?>
+                    <!-- p class="pull-left">&copy; <?= '' // Yii::$app->name ?> <?= '' // date('Y') ?></p -->
+                </div>
+            </div>
+        </div>
         <!-- p class="pull-right"><?= '' // Yii::powered() ?></p -->
     </div>
 </footer>

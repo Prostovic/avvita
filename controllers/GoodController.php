@@ -3,8 +3,6 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Good;
-use app\models\GoodSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -13,6 +11,9 @@ use yii\web\Response;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 
+use app\models\Good;
+use app\models\GoodSearch;
+use app\models\Goodimg;
 use app\models\User;
 
 /**
@@ -73,7 +74,7 @@ class GoodController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         Url::remember();
 
-        return $this->render('index', [
+        return $this->render('userindex', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -108,6 +109,7 @@ class GoodController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $model->uploadFile($model->gd_id);
             return $this->redirect(['list', ]);
 //            return $this->redirect(['view', 'id' => $model->gd_id]);
         } else {
@@ -133,6 +135,7 @@ class GoodController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $model->uploadFile($model->gd_id);
             return $this->redirect(['list', ]);
 //            return $this->redirect(['view', 'id' => $model->gd_id]);
         } else {
@@ -150,9 +153,36 @@ class GoodController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+//        $this->findModel($id)->delete();
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @return string
+     */
+    public function actionDeletefile($id) {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = $this->findModel($id);
+        $fileId = Yii::$app->request->getQueryParam('fileid', -1);
+        $bDel = false;
+        foreach($model->images As $ob) {
+            /** @var Goodimg $ob */
+            if( $ob->gi_id == $fileId ) {
+                $sRoorDir = str_replace('/', DIRECTORY_SEPARATOR, Yii::getAlias('@webroot'));
+                $sf = $sRoorDir . str_replace('/', DIRECTORY_SEPARATOR, $ob->gi_path);
+                if( file_exists($sf) ) {
+                    unlink($sf);
+                    $ob->delete();
+//                    Yii::info('actionDeletefile('.$id.') : delete file ' . $sf . ' ('.$ob->file_id.')');
+                    $bDel = true;
+                }
+                else {
+                    Yii::info('actionDeletefile('.$id.') : not exists file ' . $sf . ' ('.$sRoorDir.' + '.$ob->gi_path.')');
+                }
+            }
+        }
+        return $bDel ? [] : ['error' => 'Not delete file'];
     }
 
     /**
