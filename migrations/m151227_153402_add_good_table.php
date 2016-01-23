@@ -48,6 +48,8 @@ class m151227_153402_add_good_table extends BaseMigration
         $this->createIndex('idx_ordit_gd_id', '{{%orderitem}}', 'ordit_gd_id');
 
         $this->refreshCache();
+
+//        $sDir = Yii::getAlias('@webroot/images/gd');
     }
 
     public function down()

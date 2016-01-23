@@ -104,7 +104,7 @@ $pluginOptions = [
 //            ];
 
             echo '<div class="col-xs-4 image-edit-region">' . Html::img(
-                    str_replace(DIRECTORY_SEPARATOR, '/', $ob->gi_path)
+                    substr(Yii::getAlias('@webroot'), strlen($_SERVER['DOCUMENT_ROOT'])) . str_replace(['/', '\\'], ['/', '/'], $ob->gi_path)
                 )
                 . ''
                 . Html::a(

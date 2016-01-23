@@ -65,10 +65,10 @@ class UserSearch extends User
             'us_birth' => $this->us_birth,
             'us_position' => $this->us_position,
             'us_created' => $this->us_created,
-            'us_confirm' => $this->us_confirm,
-            'us_activate' => $this->us_activate,
-            'us_getnews' => $this->us_getnews,
-            'us_getstate' => $this->us_getstate,
+//            'us_confirm' => $this->us_confirm,
+//            'us_activate' => $this->us_activate,
+//            'us_getnews' => $this->us_getnews,
+//            'us_getstate' => $this->us_getstate,
         ]);
 
         $query->andFilterWhere(['like', 'us_fam', $this->us_fam])

@@ -7,7 +7,7 @@ use yii\helpers\Html;
 $data = [
     'backCreateUser' => [
         'title' => $model->isNewRecord ? 'Добавление оператора' : 'Изменение оператора',
-        'form' => '_form',
+        'form' => '_formoperator',
     ],
     'register' => [
         'title' => $model->isNewRecord ? 'Регистрация пользователя' : 'Изменение пользователя',

@@ -27,8 +27,12 @@ phpunit.phar
 /phpunit.xml
 *-local.php
 
-/web/assets
 /PHPExcel-1.8.zip
 /error.log
 /access.log
+
+/web/assets
 /web/images/gd
+
+/www/assets
+/www/images/gd

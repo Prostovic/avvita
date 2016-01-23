@@ -32,7 +32,7 @@ $linkOptions = [
         if( count($aImages) > 0 ) {
         ?>
         <div class="single-post-image">
-            <img alt="<?= Html::encode($model->gd_title) ?>" src="<?= str_replace(DIRECTORY_SEPARATOR, '/', $aImages[0]->gi_path)  ?>">
+            <img alt="<?= Html::encode($model->gd_title) ?>" src="<?= substr(Yii::getAlias('@webroot'), strlen($_SERVER['DOCUMENT_ROOT'])) . str_replace(['/', '\\'], ['/', '/'], $aImages[0]->gi_path)  ?>">
         </div>
         <?php
         }

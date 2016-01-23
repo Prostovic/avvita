@@ -127,6 +127,7 @@ $this->registerJs($sJs, View::POS_READY);
     </div>
 </div>
 */
+        $sDop = substr(Yii::getAlias('@webroot'), strlen($_SERVER['DOCUMENT_ROOT']));
         echo '<section id="main-slider" class="no-margin">';
         echo Carousel::widget([
             'controls' => [
@@ -139,15 +140,15 @@ $this->registerJs($sJs, View::POS_READY);
                 // equivalent to the above
                 [
                     'content' => $aCarousel[0]['html'], // '<img src="/theme01/carousel-01.jpg"/>',
-                    'options' => ['style' => 'background-image: url(/theme01/top-07.jpg)'],
+                    'options' => ['style' => 'background-image: url('.$sDop.'/theme01/top-07.jpg)'],
                 ],
                 [
                     'content' => $aCarousel[1]['html'], // '<img src="/theme01/carousel-01.jpg"/>',
-                    'options' => ['style' => 'background-image: url(/theme01/top-10.jpg)'],
+                    'options' => ['style' => 'background-image: url('.$sDop.'/theme01/top-10.jpg)'],
                 ],
                 [
                     'content' => $aCarousel[2]['html'], // '<img src="/theme01/carousel-01.jpg"/>',
-                    'options' => ['style' => 'background-image: url(/theme01/top-03.jpg)'],
+                    'options' => ['style' => 'background-image: url('.$sDop.'/theme01/top-03.jpg)'],
                 ],
                 // the item contains both the image and the caption
 //                [

@@ -141,7 +141,7 @@ class User extends ActiveRecord implements IdentityInterface
                 'value' => function ($event) {
                     /** @var \yii\base\Event $event */
                     $model = $event->sender;
-                    return ( $model->scenario == 'register' ) ? User::GROUP_NEWREGISTER : '';
+                    return ( $model->scenario == 'register' ) ? User::GROUP_NEWREGISTER : $model->us_group;
                 },
             ],
             [
@@ -178,6 +178,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['isAgree', ], 'required', 'on' => ['register']],
             [['isAgree', ], 'compare', 'compareValue' => 1, 'message' => 'Необходимо отметить {attribute}', 'on' => ['register']],
             [['password', ], 'required', 'on'=>['register', 'setnewpassword', ]],
+            [['password', ], 'required', 'when'=> function($model) { return $model->isNewRecord; }],
             [['us_active', 'us_position', 'us_getnews', 'us_getstate', 'us_city_id', 'us_org_id', ], 'integer'],
             [['us_birth', 'us_created', 'us_confirm', 'us_activate'], 'safe'],
             [['us_fam', 'us_name', 'us_otch'], 'string', 'max' => 32],
@@ -228,8 +229,15 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function scenarios() {
         $aRet = parent::scenarios();
+
         $aRet['backCreateUser'] = [ // регистрирует админ
+            'us_fam',
+            'us_name',
+            'us_otch',
+            'us_email',
+            'password',
         ];
+
         $aRet['register'] = [ // пользователи сами регистрируются
             'us_fam',
             'us_name',
@@ -245,6 +253,16 @@ class User extends ActiveRecord implements IdentityInterface
             'us_getnews',
             'us_getstate',
             'isAgree',
+        ];
+
+        $aRet['profile'] = [ // профиль
+            'us_fam',
+            'us_name',
+            'us_otch',
+            'us_email',
+            'us_phone',
+            'password',
+            'us_birth',
         ];
 
         $aRet['profile'] = [ // профиль
@@ -297,6 +315,26 @@ class User extends ActiveRecord implements IdentityInterface
         return $aRet;
     }
 
+    /**
+     *
+     */
+    public function setScenarioAttr() {
+        $aValues = [
+            'backCreateUser' => [
+                'us_active' => 1,
+                'us_group' => User::GROUP_OPERATOR,
+            ],
+        ];
+        Yii::info('Set scenario ' . $this->scenario . ' = ' . (isset($aValues[$this->scenario]) ? 'set' : 'none'));
+        if( isset($aValues[$this->scenario]) ) {
+            foreach( $aValues[$this->scenario] As $k=>$v ) {
+                $this->{$k} = $v;
+            }
+        }
+    }
+    /**
+     * @return array
+     */
     public function getPositions() {
         return [
             1 => 'Врач',
@@ -306,6 +344,10 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
+    /**
+     * @param null $group
+     * @return array|null
+     */
     public static function getGroups($group = null) {
         $a = [
             self::GROUP_NEWREGISTER => 'Неподтвержден',
@@ -318,6 +360,9 @@ class User extends ActiveRecord implements IdentityInterface
         return ( $group === null ) ? $a : (isset($a[$group]) ? $a[$group] : null);
     }
 
+    /**
+     * @return array|null
+     */
     public function getGroupName() {
         return self::getGroups($this->us_group);
     }

@@ -186,6 +186,9 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
+        if( !Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+            throw new ForbiddenHttpException('У Вас нет прав для доступа к этой странице');
+        }
         $this->modelScenario = 'backCreateUser';
         return $this->actionUpdate(0);
 /*
@@ -224,6 +227,7 @@ class UserController extends Controller
             $model = new User();
             $model->scenario = $this->modelScenario;
             $model->loadDefaultValues();
+            $model->setScenarioAttr();
             $bNew = true;
         }
         else {
@@ -239,7 +243,7 @@ class UserController extends Controller
                     $model->scenario = $scenario;
                 }
                 else {
-                    $model->scenario = ($model->us_group == User::GROUP_OPERATOR) || ($model->us_group == User::GROUP_ADMIN) ? 'profile' : 'testUserData';
+                    $model->scenario = ($model->us_group == User::GROUP_OPERATOR) || ($model->us_group == User::GROUP_ADMIN) ? 'backCreateUser' : 'testUserData';
                 }
             }
         }
