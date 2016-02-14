@@ -195,10 +195,21 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
+    /**
+     * @param $attribute
+     * @param $params
+     */
     public function uniqueEmail($attribute, $params) {
-        $oUser = User::findByUsername($this->{$attribute});
-        if( $oUser !== null ) {
-            $this->addError($attribute, 'Пользователь с таким Email уже зарегистрирован.');
+        $nValues = Yii::$app
+            ->db
+            ->createCommand(
+                'Select COUNT(*) From '.self::tableName().' Where '.$attribute.' = :email And us_group <> :gr_deleted',
+                [':email' => $this->{$attribute}, ':gr_deleted' => User::GROUP_DELETED]
+            )
+            ->queryScalar();
+        $nMax = $this->isNewRecord ? 0 : 1;
+        if( $nValues > $nMax ) {
+            $this->addError($attribute, 'Пользователь с таким Email уже существует. ('.$nValues.' > '.$nMax.')');
         }
     }
 
