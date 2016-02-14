@@ -431,7 +431,11 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findByUsername($username)
     {
-        return self::findOne(['and', ['us_email' => $username], ['not in', 'us_group', [User::GROUP_DELETED]]]);
+        return self::find()->where([
+            'and',
+            ['us_email' => $username],
+            ['<>', 'us_group', User::GROUP_DELETED]
+        ])->one();
     }
 
     /**
