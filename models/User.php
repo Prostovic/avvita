@@ -209,7 +209,7 @@ class User extends ActiveRecord implements IdentityInterface
             ->queryScalar();
         $nMax = $this->isNewRecord ? 0 : 1;
         if( $nValues > $nMax ) {
-            $this->addError($attribute, 'Пользователь с таким Email уже существует. ('.$nValues.' > '.$nMax.')');
+            $this->addError($attribute, 'Пользователь с таким Email уже существует.'); //  ('.$nValues.' > '.$nMax.')
         }
     }
 
