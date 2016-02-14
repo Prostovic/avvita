@@ -73,6 +73,8 @@ class UserdataSearch extends Userdata
             'ud_created' => $this->ud_created,
         ]);
 
+        $query->andWhere(['<>', 'ud_us_id', 0]); // для удаленных - их не выбираем
+
         $query->andFilterWhere(['like', 'ud_doc_key', $this->ud_doc_key]);
 
 
