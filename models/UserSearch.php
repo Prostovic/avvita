@@ -71,6 +71,8 @@ class UserSearch extends User
 //            'us_getstate' => $this->us_getstate,
         ]);
 
+        $query->andFilterWhere(['not in', 'us_group', [User::GROUP_DELETED] ]);
+
         $query->andFilterWhere(['like', 'us_fam', $this->us_fam])
             ->andFilterWhere(['like', 'us_name', $this->us_name])
             ->andFilterWhere(['like', 'us_otch', $this->us_otch])

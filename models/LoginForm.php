@@ -72,6 +72,9 @@ class LoginForm extends Model
                 if( $user->us_group == User::GROUP_BLOCKED ) {
                     $this->addError($attribute, 'Вы не можете пользоваться данным сайтом.');
                 }
+                if( $user->us_group == User::GROUP_DELETED ) {
+                    $this->addError($attribute, 'Неправильное имя пользователя или пароль.');
+                }
             }
         }
     }

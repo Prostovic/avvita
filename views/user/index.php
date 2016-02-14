@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view} {update} {confirm} {testudata}',
+                'template' => '{view} {update} {confirm} {testudata} {delete}',
                 'buttons' => [
                     'confirm' => function ($url, $model, $key) {
                         return $model->us_group == \app\models\User::GROUP_NEWREGISTER ?

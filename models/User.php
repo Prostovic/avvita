@@ -48,6 +48,7 @@ class User extends ActiveRecord implements IdentityInterface
     const GROUP_BLOCKED = 'blocked';
     const GROUP_OPERATOR = 'operator';
     const GROUP_ADMIN = 'admin';
+    const GROUP_DELETED = 'del';
 
     public $isAgree;
     public $password = '';
@@ -184,7 +185,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['us_fam', 'us_name', 'us_otch'], 'string', 'max' => 32],
             [['password'], 'string', 'min' => 3],
             [['us_email'], 'string', 'max' => 64],
-            [['us_email'], 'unique', ],
+            [['us_email'], 'uniqueEmail', ],
             [['us_email'], 'email', ],
             [['us_group'], 'in', 'range' => array_keys(self::getGroups()), ],
             [['us_phone'], 'string', 'max' => 24],
@@ -192,6 +193,13 @@ class User extends ActiveRecord implements IdentityInterface
             [['us_adr_post', 'us_pass', 'us_city', 'us_org', 'us_op_key', ], 'string', 'max' => 255],
             [['us_group'], 'string', 'max' => 16]
         ];
+    }
+
+    public function uniqueEmail($attribute, $params) {
+        $oUser = User::findByUsername($this->{$attribute});
+        if( $oUser !== null ) {
+            $this->addError($attribute, 'Пользователь с таким Email уже зарегистрирован.');
+        }
     }
 
     /**
@@ -227,6 +235,9 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
+    /**
+     * @return array
+     */
     public function scenarios() {
         $aRet = parent::scenarios();
 
@@ -420,7 +431,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findByUsername($username)
     {
-        return self::findOne(['us_email' => $username]);
+        return self::findOne(['and', ['us_email' => $username], ['not in', 'us_group', [User::GROUP_DELETED]]]);
     }
 
     /**

@@ -284,7 +284,11 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-//        $this->findModel($id)->delete();
+        $model = $this->findModel($id); // ->delete();
+        $model->us_group = User::GROUP_DELETED;
+        if( !$model->save(false) ) {
+            Yii::info('Error delete User: ' . print_r($model->getErrors(), true));
+        }
 
         return $this->redirect(['index']);
     }
