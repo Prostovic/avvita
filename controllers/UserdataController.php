@@ -15,6 +15,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\widgets\ActiveForm;
 use yii\web\Response;
+use app\components\Orderhelper;
 
 /**
  * UserdataController implements the CRUD actions for Userdata model.
@@ -104,6 +105,7 @@ class UserdataController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Orderhelper::getActiveOrderData(true);
             return $this->redirect(['index', ]);
         } else {
             return $this->render('append', [

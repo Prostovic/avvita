@@ -8,6 +8,7 @@ $sfConLocal = __DIR__ . DIRECTORY_SEPARATOR . 'console-local.php';
 
 $config = [
     'id' => 'basic-console',
+    'name' => 'Аввита бонус-портал',
     'controllerNamespace' => 'app\commands',
     'modules' => [
         'gii' => 'yii\gii\Module',

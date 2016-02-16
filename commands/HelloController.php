@@ -7,7 +7,10 @@
 
 namespace app\commands;
 
+use yii;
 use yii\console\Controller;
+use app\components\Notificator;
+use app\models\User;
 
 /**
  * This command echoes the first argument that you have entered.
@@ -25,6 +28,20 @@ class HelloController extends Controller
      */
     public function actionIndex($message = 'hello world')
     {
+        $model = new User();
+        $model->us_email = '452@list.ru';
+        $model->us_fam = 'Fam';
+        $model->us_name = 'Name';
+        $model->us_otch = 'Otch';
+
+        $oNotify = new Notificator([$model], $model, 'activate_mail');
+        $oNotify->notifyMail('Вы проверены на портале "' . Yii::$app->name . '"');
+
+//        Yii::$app->mailer->compose()
+//            ->setFrom(Yii::$app->mailer->username)
+//            ->setTo('452@list.ru')
+//            ->setSubject('Email sent from Yii2-Swiftmailer')
+//            ->send();
         echo $message . "\n";
     }
 }
