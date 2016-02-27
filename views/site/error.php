@@ -8,13 +8,20 @@
 use yii\helpers\Html;
 
 $this->title = $name;
+
+/*
+<p>
+Код ошибки <?= $exception->getCode() . ' ' . get_class($exception) ?>.
+</p>
+*/
+
 ?>
 <div class="site-error">
 
     <!-- h1><?= '' // Html::encode($this->title) ?></h1 -->
 
     <div class="alert alert-danger">
-        <?= nl2br(Html::encode($message)) ?>
+        <?= nl2br(Html::encode($message . ' [' . $name . ']')) ?>
     </div>
 
     <p>

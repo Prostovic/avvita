@@ -101,3 +101,30 @@ $bClientForm = ($model->us_group != User::GROUP_OPERATOR) && ($model->us_group !
     <?php ActiveForm::end(); ?>
 
 </div>
+<?php
+$sJs = <<<EOT
+var showInModal = function(title, text) {
+    var ob = jQuery('#messagemodaldata'),
+        oBody = ob.find('.modal-body'),
+        oTitle = ob.find('.modal-header span');
+
+    oBody.text(text);
+    oTitle.text(title);
+    ob.modal('show');
+};
+
+$("#register-form").on("ajaxComplete", function (jqXHR, textStatus) {
+    if( ("responseJSON" in textStatus)
+     && ("status" in textStatus.responseJSON)
+     && (textStatus.responseJSON.status != 200) ) {
+        showInModal("Ошибка на сервере", textStatus.responseJSON.message + "\\nКод ответа: " + textStatus.responseJSON.status);
+    }
+    else if( ("status" in textStatus)
+     && (textStatus.status != 200) ) {
+        showInModal("Ошибка на сервере", textStatus.responseText + "\\nКод ответа: " + textStatus.status);
+    }
+});
+EOT;
+
+$this->registerJs($sJs, \yii\web\View::POS_READY);
+

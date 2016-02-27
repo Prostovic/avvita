@@ -10,6 +10,7 @@ use yii\widgets\Breadcrumbs;
 use yii\web\View;
 
 use yii\bootstrap\Carousel;
+use yii\bootstrap\Modal;
 
 use app\assets\Theme01Asset;
 use app\models\User;
@@ -233,6 +234,16 @@ $this->registerJs($sJs, View::POS_READY);
         <!-- p class="pull-right"><?= '' // Yii::powered() ?></p -->
     </div>
 </footer>
+
+<?php
+// Окно для сообщения
+Modal::begin([
+'header' => '<span></span>',
+'id' => 'messagemodaldata',
+'size' => Modal::SIZE_LARGE,
+]);
+Modal::end();
+?>
 
 <?php $this->endBody() ?>
 </body>
