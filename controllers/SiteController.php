@@ -7,6 +7,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
+use yii\helpers\Html;
 
 use app\models\User;
 use app\models\LoginForm;
@@ -130,8 +131,32 @@ class SiteController extends Controller
         ]);
     }
 
+    /**
+     * @return string
+     */
     public function actionAbout()
     {
         return $this->render('about');
+    }
+
+    /**
+     *
+     */
+    public function actionTestmail() {
+        $sParam = 'email';
+        $sEmail = Yii::$app->request->getQueryParam($sParam, '');
+        if( empty($sEmail) ) {
+            $aLink = Url::to(['site/testmail', 'email' => '123@mail.ru']);
+            return $this->renderContent('Нужно указать параметр email в строке запроса, например ' . Html::a($aLink, $aLink));
+        }
+        else {
+            $oMail = \Yii::$app->mailer
+                ->compose('testmail', [])
+                ->setFrom(\Yii::$app->params['fromEmail'])
+                ->setTo($sEmail)
+                ->setSubject('Тестовое сообщение с сайта ' . $_SERVER['HTTP_HOST']);
+            \Yii::$app->mailer->sendMultiple([$oMail]);
+            return $this->renderContent('Отправлено письмо на адрес ' . $sEmail);
+        }
     }
 }

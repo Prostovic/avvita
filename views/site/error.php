@@ -9,6 +9,7 @@ use yii\helpers\Html;
 
 $this->title = $name;
 
+$isMailException = strpos(strtolower(get_class($exception)), 'swift_') !== false;
 /*
 <p>
 Код ошибки <?= $exception->getCode() . ' ' . get_class($exception) ?>.

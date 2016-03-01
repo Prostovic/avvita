@@ -98,6 +98,9 @@ $bClientForm = ($model->us_group != User::GROUP_OPERATOR) && ($model->us_group !
         <?= Html::submitButton($model->isNewRecord ? 'Отправить' : 'Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
 
+    <div class="clearfix"></div>
+
+    <p><?= Html::a('Повторная отправка письма о подтверждении регистрации', ['user/repeateconfirm'], ['style' => 'color: #777777;']) ?></p>
     <?php ActiveForm::end(); ?>
 
 </div>

@@ -15,6 +15,7 @@ use yii\web\Response;
 
 use app\models\User;
 use app\models\UserSearch;
+use app\models\RepeatemailForm;
 use app\components\Notificator;
 
 /**
@@ -291,6 +292,36 @@ class UserController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * repeate confirm email send
+     * @return mixed
+     */
+    public function actionRepeateconfirm()
+    {
+        $model = new RepeatemailForm();
+
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
+        if( $model->load(Yii::$app->request->post()) && $model->validate() ) {
+            $oUser = $model->getUser();
+            if( $oUser ) {
+                $oNotify = new Notificator([$oUser], $oUser, 'confirm_mail');
+                $oNotify->notifyMail('Подтвердите регистрацию на портале "' . Yii::$app->name . '"');
+                Yii::$app->session->setFlash('success', 'На Ваш адрес отправлено письмо о подтверждении регистрации.');
+            }
+            else {
+                Yii::$app->session->setFlash('alert', 'Ошибка поиска пользователя.');
+            }
+        }
+
+        return $this->render('_repeatconfirmmailform', [
+            'model' => $model,
+        ]);
     }
 
     /**
