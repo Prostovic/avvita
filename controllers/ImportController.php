@@ -42,6 +42,9 @@ class ImportController extends Controller
     }
 */
 
+    /**
+     * @return string|\yii\web\Response
+     */
     public function actionCity()
     {
         $model = new FileForm();
@@ -65,12 +68,26 @@ class ImportController extends Controller
                 ];
                 $oConverter->keyfields = ['city_key', ];
 //            Yii::info('File: ' . $sf);
-                $oConverter->read();
+                $aMessage = [
+                    'class' => 'success',
+                    'text' => 'Данные импортированы',
+                ];
+                try {
+                    $oConverter->read();
+                }
+                catch( \Exception $e ) {
+                    Yii::error('Error import City: ' . $e->getMessage());
+                    $aMessage = [
+                        'class' => 'danger',
+                        'text' => 'Ошибка импорта данных',
+                    ];
+                }
                 unlink($sf);
-                Yii::$app->session->setFlash('success', 'Данные импортированы');
+                Yii::$app->session->setFlash($aMessage['class'], $aMessage['text']);
             }
             else {
-                Yii::$app->session->setFlash('danger', 'Error validate file: ' . print_r($model->getErrors(), true));
+                Yii::error('Error upload City file: ' . print_r($model->getErrors(), true));
+                Yii::$app->session->setFlash('danger', 'Ошибка загрузки файла');
             }
             return $this->refresh();
         }
@@ -80,6 +97,9 @@ class ImportController extends Controller
         ]);
     }
 
+    /**
+     * @return string|\yii\web\Response
+     */
     public function actionOrg()
     {
         $model = new FileForm();
@@ -102,13 +122,27 @@ class ImportController extends Controller
                     'org_name' => 2,
                 ];
                 $oConverter->keyfields = ['org_key', ];
+                $aMessage = [
+                    'class' => 'success',
+                    'text' => 'Данные импортированы',
+                ];
 //            Yii::info('File: ' . $sf);
-                $oConverter->read();
+                try {
+                    $oConverter->read();
+                }
+                catch( \Exception $e ) {
+                    Yii::error('Error import Org: ' . $e->getMessage());
+                    $aMessage = [
+                        'class' => 'danger',
+                        'text' => 'Ошибка импорта данных',
+                    ];
+                }
                 unlink($sf);
-                Yii::$app->session->setFlash('success', 'Данные импортированы');
+                Yii::$app->session->setFlash($aMessage['class'], $aMessage['text']);
             }
             else {
-                Yii::$app->session->setFlash('danger', 'Error validate file: ' . print_r($model->getErrors(), true));
+                Yii::error('Error upload Org file: ' . print_r($model->getErrors(), true));
+                Yii::$app->session->setFlash('danger', 'Ошибка загрузки файла');
             }
             return $this->refresh();
         }
@@ -118,6 +152,9 @@ class ImportController extends Controller
         ]);
     }
 
+    /**
+     * @return string|\yii\web\Response
+     */
     public function actionData() {
         $model = new FileForm();
         $model->extensions = ['xml', ];
@@ -129,26 +166,11 @@ class ImportController extends Controller
             $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . time() . '-tmp.' . $oFile->extension; // $oFile->baseName .
 //                $sf = Yii::getAlias('@app/runtime') . DIRECTORY_SEPARATOR . 'tmp.' . $oFile->extension; // $oFile->baseName .
                 $oFile->saveAs($sf);
-                Yii::info('File: ' . $sf . ' ' . (file_exists($sf) ? ' OK' : ' FAIL'));
+                Yii::trace('File: ' . $sf . ' ' . (file_exists($sf) ? ' OK' : ' FAIL'));
+
                 $oConverter = new XmlConverter();
                 $oConverter->className = Docdata::className();
                 $oConverter->filePath = $sf;
-                $oConverter->xsl = <<<EOT
-<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:template match="/">
-        <xsl:text disable-output-escaping="yes">$</xsl:text>ret = [
-        <xsl:apply-templates select="BONUSES/BONUS" />
-        ];
-    </xsl:template>
-
-    <xsl:template match="BONUS">
-        'docid' = '<xsl:value-of select="BONUS/@НомерДокумента" />',
-    </xsl:template>
-
-</xsl:stylesheet>
-EOT;
-
                 $oConverter->fields = [
                     'doc_key' => 'НомерДокумента',
                     'doc_date' => 'ДатаДокумента',
@@ -168,6 +190,7 @@ EOT;
                 }
             }
             else {
+                Yii::error('Error validate file: ' . print_r($model->getErrors(), true));
                 Yii::$app->session->setFlash('danger', 'Error validate file: ' . print_r($model->getErrors(), true));
             }
             return $this->refresh();

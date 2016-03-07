@@ -66,9 +66,9 @@ class XmlConverter {
             throw new InvalidParamException('Нужно указать поля для импорта данных');
         }
 
-        if ( $this->xsl == null) {
-            throw new InvalidParamException('Нужно указать таблицу стилей для преобразования');
-        }
+//        if ( $this->xsl == null) {
+//            throw new InvalidParamException('Нужно указать таблицу стилей для преобразования');
+//        }
 
         $sClass = $this->className;
 /*
@@ -104,7 +104,12 @@ class XmlConverter {
 //                                $name = strtolower($reader->localName);
                                 while ($reader->moveToNextAttribute()){
                                     // здесь мы получаем атрибуты если они есть
-                                    $item['__attribs'][$reader->localName] = $reader->value;
+                                    $sVal = $reader->value;
+                                    // тут мы заменяем запятую в нецелых числах на точку
+                                    if( preg_match('|^[\\d]+,[\\d]+$|', $sVal) ) {
+                                        $sVal = str_replace(',', '.', $sVal);
+                                    }
+                                    $item['__attribs'][$reader->localName] = $sVal;
                                 }
                                 $reader->read();
                                 if (isset($item) && is_array($item)){
@@ -133,7 +138,7 @@ class XmlConverter {
                         }
                         if( !$ob->save() ) {
                             Yii::warning('Error save data ' . print_r($item, true) . "\n" . print_r($ob->getErrors(), true));
-                            Yii::$app->session->setFlash('danger', $ob->getErrors());
+                            Yii::$app->session->setFlash('danger', 'Ошибка импорта данных.');
                             $bOk = false;
                             break;
                         }
