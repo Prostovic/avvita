@@ -61,6 +61,19 @@ class OrderForm extends Model
         if( $nCou > 0 ) {
             $this->addError($attribute, 'Заказ уже есть в Вашем списке.');
         }
+        else {
+            $nCou = Yii::$app
+                ->db
+                ->createCommand(
+                    'Select COUNT(*) From ' . Userdata::tableName() . ' Where ud_doc_key = :ordernum',
+                    [':ordernum' => $this->{$attribute}, ]
+                )
+                ->queryScalar();
+            if( $nCou > 0 ) {
+                $this->addError($attribute, 'Заказ уже закреплен за пользователем.');
+            }
+        }
+
     }
 
     /**

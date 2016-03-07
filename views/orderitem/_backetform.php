@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use app\models\User;
 
 use app\models\Orderitem;
 use app\models\Userorder;
@@ -13,6 +14,8 @@ use app\models\Userorder;
 if( !isset($showedit) ) {
     $showedit = true;
 }
+
+$bOperator = Yii::$app->user->can(User::GROUP_OPERATOR);
 
 ?>
 <div class="backetform-view">
@@ -52,7 +55,7 @@ if( $showedit ) {
             <th>Баллы</th>
             <th>Сумма</th>
             <?php
-            if( $showedit ) {
+            if( $showedit || $bOperator ) {
                 echo '<th></th>';
             }
             ?>
@@ -107,6 +110,11 @@ foreach($items As $obItem) {
             if( $showedit ) {
                 echo '<td>' . Html::a('<span class="glyphicon glyphicon-remove"></span>', '#', ['class'=>'btn btn-danger deleterow']) . '</td>';
             }
+            else {
+                if( $bOperator ) {
+                    echo '<td>' . Html::a('<span class="glyphicon glyphicon-remove"></span>', ['orderitem/delete', 'id'=>$obItem->ordit_id], ['class'=>'btn btn-danger deleteorderitem']) . '</td>';
+                }
+            }
         ?>
     </tr>
 <?php
@@ -124,7 +132,7 @@ foreach($items As $obItem) {
                 ?>
             </td>
             <?php
-                if( $showedit ) {
+                if( $showedit || $bOperator ) {
                     echo '<td></td>';
                 }
             ?>
@@ -210,11 +218,61 @@ jQuery(".deleterow")
             return false;
         }
     );
+console.log("deleteorderitem");
+jQuery(".deleteorderitem")
+    .on(
+        "click",
+        function(event){
+            event.preventDefault();
+            yii.confirm("Проверка confirm", function(){ return true; }, function(){ return false; });
+//            var oRow = jQuery(this).parents("tr:first"), oInp = oRow.find("input:first");
+//            oInp.val(0);
+//            oRow.hide();
+//            oInp.trigger("change");
+            return false;
+        }
+    );
 jQuery(".num_good input").on("change", function(event){
     fCountSum();
 });
 EOT;
 $this->registerJs($sJs);
+}
+else if( $bOperator ) {
+    $sJs = <<<EOT
+jQuery(".deleteorderitem")
+    .on(
+        "click",
+        function(event){
+            event.preventDefault();
+            var sLink = jQuery(this).attr("href");
+            yii.confirm(
+                "Вы действительно хотите удалить данный элемент?",
+                function(){
+                    // ok
+                    jQuery.ajax({
+                        type: "POST",
+                        url: sLink,
+                        data: {},
+                        success: function(data, textStatus, jqXHR){
+                        },
+                        dataType: "html"
+                    });
+                    return true;
+                },
+                function(){
+                    // cancel
+                    return false;
+                }
+            );
+            return false;
+        }
+    );
+jQuery(".num_good input").on("change", function(event){
+    fCountSum();
+});
+EOT;
+    $this->registerJs($sJs);
 }
 ?>
 

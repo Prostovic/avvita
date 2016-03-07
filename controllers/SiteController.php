@@ -14,6 +14,7 @@ use app\models\LoginForm;
 use app\models\RestoreForm;
 use app\models\ContactForm;
 use app\models\GoodSearch;
+use app\components\Orderhelper;
 
 class SiteController extends Controller
 {
@@ -77,6 +78,7 @@ class SiteController extends Controller
             $oUser = Yii::$app->user->identity;
             /** @var app\\models\\User $oUser */
             if( Yii::$app->user->can(User::GROUP_CLIENT) ) {
+                Orderhelper::getActiveOrderData(true);
                 return $this->redirect(['userdata/index']);
             }
             return $this->goBack();

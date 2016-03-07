@@ -198,4 +198,15 @@ class Userorder extends ActiveRecord
         return isset($a[$this->ord_flag]) ? $a[$this->ord_flag] : '???';
     }
 
+    /**
+     *
+     */
+    public function recalcSum() {
+        $nSumm = 0;
+        foreach($this->goods As $obItem) {
+            /** @var Orderitem $obItem */
+            $nSumm += $obItem->ordit_count * $obItem->good->gd_price;
+        }
+        return $nSumm;
+    }
 }

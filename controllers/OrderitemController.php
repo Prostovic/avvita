@@ -5,6 +5,8 @@ namespace app\controllers;
 use Yii;
 use app\models\Orderitem;
 use app\models\OrderitemSearch;
+use app\models\User;
+use app\models\Userorder;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -98,9 +100,36 @@ class OrderitemController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        if( !Yii::$app->user->can(User::GROUP_OPERATOR) ) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
 
-        return $this->redirect(['index']);
+        $obItem = $this->findModel($id); // ->delete();
+        /** @var Userorder $oOrder */
+        $oOrder = $obItem->order;
+        $obItem->ordit_count = 0;
+        $obItem->ordit_gd_id = 0;
+        $obItem->ordit_ord_id = 0;
+        if( !$obItem->save() ) {
+            Yii::error('Error delete order item: ' . print_r($obItem->getErrors(), true));
+        }
+        else {
+            $oOrder->ord_summ = $oOrder->recalcSum();
+            if( $oOrder->ord_summ > 0 ) {
+                if( $oOrder->save() ) {
+                    Yii::error('Error delete order item order error: ' . print_r($oOrder->getErrors(), true));
+                }
+                $this->redirect(['userorder/view', 'id' => $oOrder->ord_id, ]);
+            }
+            else {
+                $oOrder->delete();
+                $this->redirect(['userorder/index',]);
+            }
+        }
+
+//        $this->redirect(['userorder/confirm', 'id'=>$orderId]);
+
+//        return $this->redirect(['index']);
     }
 
     /**

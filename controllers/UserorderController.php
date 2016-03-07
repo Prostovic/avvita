@@ -147,12 +147,7 @@ class UserorderController extends Controller
             if( count(Orderhelper::getOrderErrors($model)) == 0 ) {
                 $model->ord_flag = Userorder::ORDER_FLAG_COMPLETED;
                 $model->ord_message = $_POST[$model->formName()]['ord_message'];
-                $nSumm = 0;
-                foreach($model->goods As $obItem) {
-                    /** @var Orderitem $obItem */
-                    $nSumm += $obItem->ordit_count * $obItem->good->gd_price;
-                }
-                $model->ord_summ = $nSumm;
+                $model->ord_summ = $model->recalcSum();
                 if( $model->save() ) {
                     Orderhelper::getActiveOrderData(true);
                     $this->redirect(['list']);
