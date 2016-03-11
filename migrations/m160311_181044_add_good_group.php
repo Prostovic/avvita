@@ -15,6 +15,7 @@ class m160311_181044_add_good_group extends BaseMigration
             'grp_description' => Schema::TYPE_TEXT . ' Comment \'Описание\'',
             'grp_active' => Schema::TYPE_SMALLINT . ' Default 0 Comment \'Показать\'',
             'grp_created' => Schema::TYPE_DATETIME . ' Not Null Comment \'Создана\'',
+            'grp_order' => Schema::TYPE_SMALLINT . ' Comment \'Порядок\'',
         ], $tableOptionsMyISAM);
 //        $this->createIndex('idx_ud_us_id', '{{%group}}', 'ud_us_id');
 
@@ -22,6 +23,7 @@ class m160311_181044_add_good_group extends BaseMigration
             'gdgrp_id' => Schema::TYPE_PK,
             'gdgrp_gd_id' => Schema::TYPE_INTEGER . ' Comment \'Подарок\'',
             'gdgrp_grp_id' => Schema::TYPE_INTEGER . ' Comment \'Группа\'',
+            'gdgrp_order' => Schema::TYPE_SMALLINT . ' Comment \'Порядок\'',
         ], $tableOptionsMyISAM);
         $this->createIndex('idx_gdgrp_gd_id', '{{%goodgroup}}', 'gdgrp_gd_id');
         $this->createIndex('idx_gdgrp_grp_id', '{{%goodgroup}}', 'gdgrp_grp_id');

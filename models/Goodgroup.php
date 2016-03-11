@@ -10,6 +10,7 @@ use Yii;
  * @property integer $gdgrp_id
  * @property integer $gdgrp_gd_id
  * @property integer $gdgrp_grp_id
+ * @property integer $gdgrp_order
  */
 class Goodgroup extends \yii\db\ActiveRecord
 {
@@ -27,7 +28,7 @@ class Goodgroup extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['gdgrp_gd_id', 'gdgrp_grp_id'], 'integer']
+            [['gdgrp_gd_id', 'gdgrp_grp_id', 'gdgrp_order', ], 'integer']
         ];
     }
 
@@ -40,6 +41,7 @@ class Goodgroup extends \yii\db\ActiveRecord
             'gdgrp_id' => 'Gdgrp ID',
             'gdgrp_gd_id' => 'Подарок',
             'gdgrp_grp_id' => 'Группа',
+            'gdgrp_order' => 'Порядок',
         ];
     }
 }

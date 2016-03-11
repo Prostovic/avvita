@@ -18,7 +18,7 @@ class GroupSearch extends Group
     public function rules()
     {
         return [
-            [['grp_id', 'grp_active'], 'integer'],
+            [['grp_id', 'grp_active', 'grp_order', ], 'integer'],
             [['grp_title', 'grp_imagepath', 'grp_description', 'grp_created'], 'safe'],
         ];
     }
@@ -59,6 +59,7 @@ class GroupSearch extends Group
             'grp_id' => $this->grp_id,
             'grp_active' => $this->grp_active,
             'grp_created' => $this->grp_created,
+            'grp_order' => $this->grp_order,
         ]);
 
         $query->andFilterWhere(['like', 'grp_title', $this->grp_title])

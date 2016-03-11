@@ -41,6 +41,9 @@ echo Nav::widget([
         [
             'label' => 'Подарки',
             'items' => [
+                ['label' => 'Группы подарков', 'url' => ['group/list']],
+                '<li class="dropdown-header">Список групп в системе</li>',
+                '<li class="divider"></li>',
                 ['label' => 'Список подарков', 'url' => ['good/list']],
                 '<li class="dropdown-header">Все подарки в системе</li>',
                 '<li class="divider"></li>',

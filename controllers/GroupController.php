@@ -3,11 +3,17 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Group;
-use app\models\GroupSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use yii\web\UploadedFile;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
+
+use app\models\Group;
+use app\models\GroupSearch;
+use app\models\User;
 
 /**
  * GroupController implements the CRUD actions for Group model.
@@ -23,7 +29,39 @@ class GroupController extends Controller
                     'delete' => ['post'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'list', ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', ],
+                        'roles' => ['?', User::GROUP_CLIENT, User::GROUP_OPERATOR],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create', 'update', 'delete', 'list', ],
+                        'roles' => [User::GROUP_OPERATOR],
+                    ],
+                ],
+            ],
+
         ];
+    }
+
+    /**
+     * Lists all Group models.
+     * @return mixed
+     */
+    public function actionList()
+    {
+        $searchModel = new GroupSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('list', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     /**
@@ -62,13 +100,22 @@ class GroupController extends Controller
     {
         $model = new Group();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->grp_id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
         }
+
+        if ($model->load(Yii::$app->request->post()) ) {
+            if( $model->save() ) {
+                $model->saveFile(UploadedFile::getInstance($model, 'file'));
+                return $this->redirect(['list', ]);
+//                return $this->redirect(['view', 'id' => $model->grp_id]);
+            }
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**

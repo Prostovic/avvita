@@ -3,6 +3,11 @@
 namespace app\models;
 
 use Yii;
+use yii\base\InvalidParamException;
+use yii\web\UploadedFile;
+use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%group}}".
@@ -12,10 +17,26 @@ use Yii;
  * @property string $grp_imagepath
  * @property string $grp_description
  * @property integer $grp_active
+ * @property integer $grp_order
  * @property string $grp_created
  */
 class Group extends \yii\db\ActiveRecord
 {
+    public $file = null;
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['grp_created'],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -30,11 +51,13 @@ class Group extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['grp_title', ], 'required'],
             [['grp_description'], 'string'],
-            [['grp_active'], 'integer'],
-            [['grp_created'], 'required'],
+            [['grp_active', 'grp_order', ], 'integer'],
             [['grp_created'], 'safe'],
-            [['grp_title', 'grp_imagepath'], 'string', 'max' => 255]
+            [['grp_title', 'grp_imagepath'], 'string', 'max' => 255],
+            [['file'], 'safe'],
+            [['file'], 'file', 'maxFiles' => 1, 'maxSize' => Yii::$app->params['image.maxsize'], 'extensions' => Yii::$app->params['image.ext']],
         ];
     }
 
@@ -50,6 +73,32 @@ class Group extends \yii\db\ActiveRecord
             'grp_description' => 'Описание',
             'grp_active' => 'Показать',
             'grp_created' => 'Создана',
+            'grp_order' => 'Порядок',
+            'file' => 'Картинка',
         ];
+    }
+
+    /**
+     * Сохраняем файл
+     * @param UploadedFile $obFile
+     */
+    public function saveFile($obFile) {
+        if( $obFile === null ) {
+            return true;
+        }
+        $sDir = Yii::getAlias('@webroot/images/gr');
+        if( !is_dir($sDir) ) {
+            if( !mkdir($sDir) ) {
+                throw new InvalidParamException('Каталог для картинок не существует');
+            }
+            else {
+                chmod($sDir, 0777);
+            }
+        }
+        $sf = $sDir . DIRECTORY_SEPARATOR . $this->grp_id . '.' . $obFile->extension;
+        if( $obFile->saveAs($sf) ) {
+            $this->grp_imagepath = str_replace('\\', '/', substr($sf, strlen(Yii::getAlias('@webroot'))));
+            $this->save();
+        }
     }
 }

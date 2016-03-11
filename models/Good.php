@@ -52,6 +52,7 @@ class Good extends \yii\db\ActiveRecord
             ],
         ];
     }
+
     /**
      * @inheritdoc
      */

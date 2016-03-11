@@ -18,7 +18,7 @@ class GoodgroupSearch extends Goodgroup
     public function rules()
     {
         return [
-            [['gdgrp_id', 'gdgrp_gd_id', 'gdgrp_grp_id'], 'integer'],
+            [['gdgrp_id', 'gdgrp_gd_id', 'gdgrp_grp_id', 'gdgrp_order', ], 'integer'],
         ];
     }
 
@@ -58,6 +58,7 @@ class GoodgroupSearch extends Goodgroup
             'gdgrp_id' => $this->gdgrp_id,
             'gdgrp_gd_id' => $this->gdgrp_gd_id,
             'gdgrp_grp_id' => $this->gdgrp_grp_id,
+            'gdgrp_order' => $this->gdgrp_order,
         ]);
 
         return $dataProvider;
