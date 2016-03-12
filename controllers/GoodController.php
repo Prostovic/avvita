@@ -110,6 +110,7 @@ class GoodController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $model->uploadFile($model->gd_id);
+            $model->saveGroup();
             return $this->redirect(['list', ]);
 //            return $this->redirect(['view', 'id' => $model->gd_id]);
         } else {
@@ -136,6 +137,7 @@ class GoodController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $model->uploadFile($model->gd_id);
+            $model->saveGroup();
             return $this->redirect(['list', ]);
 //            return $this->redirect(['view', 'id' => $model->gd_id]);
         } else {

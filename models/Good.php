@@ -10,6 +10,7 @@ use yii\db\Expression;
 use app\models\Orderitem;
 use app\models\Goodimg;
 use app\components\FilesaveBehavior;
+use app\models\Goodgroup;
 
 /**
  * This is the model class for table "{{%good}}".
@@ -26,6 +27,8 @@ use app\components\FilesaveBehavior;
 class Good extends \yii\db\ActiveRecord
 {
     public $file = null;
+
+    public $groupid;
 
     public function behaviors()
     {
@@ -70,7 +73,8 @@ class Good extends \yii\db\ActiveRecord
             [['gd_title', 'gd_price', ], 'required'],
             [['gd_description'], 'string'],
             [['gd_price'], 'number'],
-            [['gd_number', 'gd_active'], 'integer'],
+            [['gd_number', 'gd_active', 'groupid'], 'integer'],
+            [['groupid'], 'in', 'range' => array_keys(Group::getAllgroups()), ],
             [['gd_created'], 'safe'],
             [['gd_title', 'gd_imagepath'], 'string', 'max' => 255],
             [['file'], 'safe'],
@@ -93,6 +97,7 @@ class Good extends \yii\db\ActiveRecord
             'gd_created' => 'Создан',
             'items' => 'В заказах',
             'ordered' => 'Заказано',
+            'groupid' => 'Группа',
         ];
     }
 
@@ -127,5 +132,34 @@ class Good extends \yii\db\ActiveRecord
                 'gi_gd_id' => 'gd_id'
             ]
         );
+    }
+
+    /**
+     *
+     */
+    public function saveGroup() {
+        $sSql = 'Update ' . Goodgroup::tableName()
+            . ' Set gdgrp_gd_id = 0, gdgrp_grp_id = 0, gdgrp_order = 0'
+            . ' Where gdgrp_gd_id = ' . $this->gd_id;
+        Yii::$app->db->createCommand($sSql)->execute();
+        $sSql = 'Update ' . Goodgroup::tableName()
+            . ' Set gdgrp_gd_id = :goodid, gdgrp_grp_id = :groupid, gdgrp_order = 0'
+            . ' Where gdgrp_gd_id = 0'
+            . ' Limit 1';
+        $n = Yii::$app->db->createCommand($sSql, [':goodid' => $this->gd_id, ':groupid' => $this->groupid])->execute();
+        if( $n < 1 ) {
+            $ob = new Goodgroup();
+            $ob->gdgrp_gd_id = $this->gd_id;
+            $ob->gdgrp_grp_id = $this->groupid;
+            $ob->gdgrp_order = 0;
+            if( !$ob->save() ) {
+                Yii::info('Error save goodgroup: '
+                    . print_r($ob->getErrors(), true)
+                    . "\n"
+                    . print_r($ob->attributes, true)
+                );
+            }
+        }
+
     }
 }

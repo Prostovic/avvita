@@ -50,7 +50,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     /** @var $model app\models\Group */
                     return Html::img($model->grp_imagepath, ['alt' => $model->grp_title, 'style' => 'float: left; margin: 0 10px 10px 0; border: 1px solid #666666;'])
                         . '<span class="glyphicon glyphicon-'.($model->grp_active ? 'ok' : 'remove') . ' right-glyth"></span>'
-                        . '<strong>' . Html::encode($model->grp_title) . '</strong>';
+                        . '<strong>' . Html::encode($model->grp_title) . '</strong>'
+                        . ' [' . count($model->goods) . ']';
                 },
             ],
 //            'grp_imagepath',

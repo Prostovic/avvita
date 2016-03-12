@@ -8,6 +8,7 @@ use yii\web\View;
 use kartik\file\FileInput;
 
 use app\models\Goodimg;
+use app\models\Group;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Good */
@@ -50,8 +51,12 @@ $pluginOptions = [
         'validateOnSubmit' => true,
     ]); ?>
 
-    <div class="col-xs-6">
+    <div class="col-xs-3">
     <?= $form->field($model, 'gd_title')->textInput(['maxlength' => true]) ?>
+    </div>
+
+    <div class="col-xs-3">
+    <?= $form->field($model, 'groupid')->dropDownList(Group::getAllgroups()) ?>
     </div>
 
     <div class="col-xs-3">

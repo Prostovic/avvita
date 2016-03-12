@@ -4,11 +4,14 @@ namespace app\models;
 
 use Yii;
 use yii\base\InvalidParamException;
+use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\db\Expression;
+
+use app\models\Goodgroup;
 
 /**
  * This is the model class for table "{{%group}}".
@@ -24,6 +27,7 @@ use yii\db\Expression;
 class Group extends \yii\db\ActiveRecord
 {
     public $file = null;
+    public static $_cache = [];
 
     public function behaviors()
     {
@@ -113,5 +117,44 @@ class Group extends \yii\db\ActiveRecord
             $this->grp_imagepath = str_replace('\\', '/', substr($sf, strlen(Yii::getAlias('@webroot'))));
             $this->save();
         }
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupgoods() {
+        return $this->hasMany(
+            Goodgroup::className(),
+            [
+                'gdgrp_grp_id' => 'grp_id',
+            ]
+        );
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGoods() {
+        return $this->hasMany(
+            Good::className(),
+            [
+                'gd_id' => 'gdgrp_gd_id',
+            ]
+        )
+        ->via('groupgoods');
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function getAllgroups() {
+        if( !isset(self::$_cache['list']) ) {
+            self::$_cache['list'] = ArrayHelper::map(
+                self::find()->where(['grp_active' => 1, ])->orderBy(['grp_title' => SORT_ASC])->all(),
+                'grp_id',
+                'grp_title'
+            );
+        }
+        return self::$_cache['list'];
     }
 }

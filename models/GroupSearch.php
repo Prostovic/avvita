@@ -43,6 +43,8 @@ class GroupSearch extends Group
     {
         $query = Group::find();
 
+        $query->with('goods');
+
         $aProvider = [
             'query' => $query,
             'sort'=> [
