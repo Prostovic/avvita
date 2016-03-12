@@ -43,9 +43,14 @@ class GroupSearch extends Group
     {
         $query = Group::find();
 
-        $dataProvider = new ActiveDataProvider([
+        $aProvider = [
             'query' => $query,
-        ]);
+            'sort'=> [
+                'defaultOrder' => isset($params['sort']) ? $params['sort'] : ['grp_order' => SORT_ASC]
+            ]
+        ];
+
+        $dataProvider = new ActiveDataProvider($aProvider);
 
         $this->load($params);
 

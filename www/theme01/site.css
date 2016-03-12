@@ -513,3 +513,8 @@ h3 {
     border-radius: 3px;
     white-space: nowrap;
 }
+
+.right-glyth {
+    float: right;
+    margin-left: 10px;
+}

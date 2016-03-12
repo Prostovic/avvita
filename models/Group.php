@@ -7,6 +7,7 @@ use yii\base\InvalidParamException;
 use yii\web\UploadedFile;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
+use yii\behaviors\AttributeBehavior;
 use yii\db\Expression;
 
 /**
@@ -33,6 +34,18 @@ class Group extends \yii\db\ActiveRecord
                     ActiveRecord::EVENT_BEFORE_INSERT => ['grp_created'],
                 ],
                 'value' => new Expression('NOW()'),
+            ],
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'grp_order',
+                ],
+                'value' => function ($event) {
+                    /** @var \yii\base\Event $event */
+
+                    $nVal =  Yii::$app->db->createCommand('Select MAX(grp_order) + 1 As nextorder From ' . Group::tableName())->queryScalar();
+                    return $nVal ? $nVal : 1;
+                },
             ],
         ];
     }

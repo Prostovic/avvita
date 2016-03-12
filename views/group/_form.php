@@ -38,8 +38,16 @@ $pluginOptions = [
         'validateOnSubmit' => true,
     ]); ?>
 
-    <div class="col-xs-12">
+    <div class="col-xs-8">
         <?= $form->field($model, 'grp_title')->textInput(['maxlength' => true]) ?>
+    </div>
+
+    <div class="col-xs-2">
+        &nbsp;
+    </div>
+
+    <div class="col-xs-2">
+        <?= $form->field($model, 'grp_active', ['template' => '<label class="control-label">&nbsp;</label><br />{input}{error}'])->checkbox() ?>
     </div>
 
     <?= '' // $form->field($model, 'grp_imagepath')->textInput(['maxlength' => true]) ?>

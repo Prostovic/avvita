@@ -98,7 +98,41 @@ class GroupController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Group();
+        return $this->actionUpdate(0);
+//        $model = new Group();
+//
+//        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+//            Yii::$app->response->format = Response::FORMAT_JSON;
+//            return ActiveForm::validate($model);
+//        }
+//
+//        if ($model->load(Yii::$app->request->post()) ) {
+//            if( $model->save() ) {
+//                $model->saveFile(UploadedFile::getInstance($model, 'file'));
+//                return $this->redirect(['list', ]);
+////                return $this->redirect(['view', 'id' => $model->grp_id]);
+//            }
+//        }
+//
+//        return $this->render('create', [
+//            'model' => $model,
+//        ]);
+    }
+
+    /**
+     * Updates an existing Group model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdate($id)
+    {
+        if( $id == 0 ) {
+            $model = new Group();
+        }
+        else {
+            $model = $this->findModel($id);
+        }
 
         if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -113,28 +147,9 @@ class GroupController extends Controller
             }
         }
 
-        return $this->render('create', [
+        return $this->render($id == 0 ? 'create' : 'update', [
             'model' => $model,
         ]);
-    }
-
-    /**
-     * Updates an existing Group model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->grp_id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
     }
 
     /**
