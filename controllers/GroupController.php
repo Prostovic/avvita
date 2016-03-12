@@ -58,9 +58,15 @@ class GroupController extends Controller
         $searchModel = new GroupSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $aVals = Yii::$app->db->createCommand('Select MIN(grp_order) As minval, MAX(grp_order) As maxval From ' . Group::tableName())->queryOne(\PDO::FETCH_ASSOC);
+
+        list($nMinOrder, $nMaxOrder) = (is_array($aVals) && (count($aVals) > 1)) ? array_values($aVals) : [0, 0];
+
         return $this->render('list', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'nMinOrder' => $nMinOrder,
+            'nMaxOrder' => $nMaxOrder,
         ]);
     }
 
@@ -163,6 +169,47 @@ class GroupController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @param integer $id
+     * @return Response
+     */
+    public function actionDown($id) {
+        return $this->actionUp($id, false);
+    }
+
+    /**
+     * @param integer $id
+     * @param bool $bUp
+     * @return Response
+     */
+    public function actionUp($id, $bUp = true)
+    {
+        $model = $this->findModel($id);
+        $sSql = 'Select grp_id, grp_order From '
+            . Group::tableName()
+            . ' Where grp_order ' . ($bUp ? '<' : '>') . ' ' . $model->grp_order
+            . ' Order By grp_order ' . ($bUp ? 'DESC' : 'ASC')
+            . ' Limit 1';
+
+        $aVals = Yii::$app->db->createCommand($sSql)->queryOne(\PDO::FETCH_ASSOC);
+
+        if( $aVals !== null ) {
+            $ob = $this->findModel($aVals['grp_id']);
+            $ob->grp_order = $model->grp_order;
+            $model->grp_order = $aVals['grp_order'];
+            if( !$ob->save() ) {
+                Yii::info('Error save Group ob after up: ' . print_r($ob->getErrors(), true));
+            }
+            else {
+                if( !$model->save() ) {
+                    Yii::info('Error save Group model after up: ' . print_r($model->getErrors(), true));
+                }
+            }
+        }
+
+        return $this->redirect(['list']);
     }
 
     /**

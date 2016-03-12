@@ -2,10 +2,13 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use app\models\Group;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\GroupSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $nMinOrder integer */
+/* @var $nMaxOrder integer */
 
 $this->title = 'Группы подарков';
 $this->params['breadcrumbs'][] = $this->title;
@@ -55,7 +58,24 @@ $this->params['breadcrumbs'][] = $this->title;
 //            'grp_active',
             // 'grp_created',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{update} {up} {down}',
+                'buttons' => [
+                    'up' => function ($url, $model, $key) use($nMinOrder) {
+                        /** @var Group $model */
+                        return $model->grp_order == $nMinOrder ?
+                            '' :
+                            Html::a('<span class="glyphicon glyphicon-arrow-up"></span>', $url, []);
+                    },
+                    'down' => function ($url, $model, $key) use ($nMaxOrder) {
+                        /** @var Group $model */
+                        return $model->grp_order == $nMaxOrder ?
+                            '' :
+                            Html::a('<span class="glyphicon glyphicon-arrow-down"></span>', $url, []);
+                    },
+                ],
+            ],
         ],
     ]); ?>
 
