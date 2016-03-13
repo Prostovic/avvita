@@ -51,6 +51,7 @@ $pluginOptions = [
         'validateOnSubmit' => true,
     ]); ?>
 
+
     <div class="col-xs-3">
     <?= $form->field($model, 'gd_title')->textInput(['maxlength' => true]) ?>
     </div>

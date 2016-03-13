@@ -14,6 +14,7 @@ use app\models\LoginForm;
 use app\models\RestoreForm;
 use app\models\ContactForm;
 use app\models\GoodSearch;
+use app\models\GroupSearch;
 use app\components\Orderhelper;
 
 class SiteController extends Controller
@@ -58,11 +59,15 @@ class SiteController extends Controller
     {
         $searchModel = new GoodSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $searchGroup = new GroupSearch();
+        $dataGroup = $searchGroup->search(Yii::$app->request->queryParams);
         Url::remember();
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'searchGroup' => $searchGroup,
+            'dataGroup' => $dataGroup,
         ]);
 //        return $this->render('index');
     }

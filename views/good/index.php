@@ -19,7 +19,10 @@ $columns = [
     'gd_number',
     [
         'class' => 'yii\grid\DataColumn',
-        'attribute' => 'ordered',
+        'attribute' => '_ordered',
+        'value' => function ($model, $key, $index, $column) {
+            return $model->ordered;
+        },
     ],
     [
         'class' => 'yii\grid\ActionColumn',

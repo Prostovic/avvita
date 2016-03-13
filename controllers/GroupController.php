@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -14,6 +15,7 @@ use yii\widgets\ActiveForm;
 use app\models\Group;
 use app\models\GroupSearch;
 use app\models\User;
+use app\models\GoodSearch;
 
 /**
  * GroupController implements the CRUD actions for Group model.
@@ -31,11 +33,11 @@ class GroupController extends Controller
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'view', 'create', 'update', 'delete', 'list', ],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'list', 'goods', ],
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'view', ],
+                        'actions' => ['index', 'view', 'goods', ],
                         'roles' => ['?', User::GROUP_CLIENT, User::GROUP_OPERATOR],
                     ],
                     [
@@ -80,6 +82,21 @@ class GroupController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all Group goods.
+     * @return mixed
+     */
+    public function actionGoods($id)
+    {
+        $searchModel = new GoodSearch();
+        $dataProvider = $searchModel->search([$searchModel->formName() => ['groupid' => $id], ]);
+
+        return $this->render('//good/userindex', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -138,6 +155,7 @@ class GroupController extends Controller
         }
         else {
             $model = $this->findModel($id);
+            $model->_goods = ArrayHelper::map($model->groupgoods, 'gdgrp_gd_id', 'gdgrp_gd_id');
         }
 
         if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
@@ -148,6 +166,7 @@ class GroupController extends Controller
         if ($model->load(Yii::$app->request->post()) ) {
             if( $model->save() ) {
                 $model->saveFile(UploadedFile::getInstance($model, 'file'));
+                $model->saveGoods();
                 return $this->redirect(['list', ]);
 //                return $this->redirect(['view', 'id' => $model->grp_id]);
             }

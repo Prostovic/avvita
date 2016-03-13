@@ -27,6 +27,9 @@ use app\models\Goodgroup;
 class Group extends \yii\db\ActiveRecord
 {
     public $file = null;
+
+    public $_goods = [];
+
     public static $_cache = [];
 
     public function behaviors()
@@ -74,6 +77,7 @@ class Group extends \yii\db\ActiveRecord
             [['grp_created'], 'safe'],
             [['grp_title', 'grp_imagepath'], 'string', 'max' => 255],
             [['file'], 'safe'],
+            [['_goods'], 'in', 'range' => ArrayHelper::map(Good::getAllGoods(), 'gd_id', 'gd_id'), 'allowArray' => true, ],
             [['file'], 'file', 'maxFiles' => 1, 'maxSize' => Yii::$app->params['image.maxsize'], 'extensions' => Yii::$app->params['image.ext']],
         ];
     }
@@ -92,6 +96,7 @@ class Group extends \yii\db\ActiveRecord
             'grp_created' => 'Создана',
             'grp_order' => 'Порядок',
             'file' => 'Картинка',
+            '_goods' => 'Подарки',
         ];
     }
 
@@ -156,5 +161,32 @@ class Group extends \yii\db\ActiveRecord
             );
         }
         return self::$_cache['list'];
+    }
+
+    public function saveGoods() {
+        $sSql = 'Update ' . Goodgroup::tableName()
+            . ' Set gdgrp_gd_id = 0, gdgrp_grp_id = 0, gdgrp_order = 0'
+            . ' Where gdgrp_grp_id = ' . $this->grp_id;
+        Yii::$app->db->createCommand($sSql)->execute();
+        foreach($this->_goods As $gid) {
+            $sSql = 'Update ' . Goodgroup::tableName()
+                . ' Set gdgrp_gd_id = :goodid, gdgrp_grp_id = :groupid, gdgrp_order = 0'
+                . ' Where gdgrp_gd_id = 0'
+                . ' Limit 1';
+            $n = Yii::$app->db->createCommand($sSql, [':goodid' => $gid, ':groupid' => $this->grp_id])->execute();
+            if( $n < 1 ) {
+                $ob = new Goodgroup();
+                $ob->gdgrp_gd_id = $gid;
+                $ob->gdgrp_grp_id = $this->grp_id;
+                $ob->gdgrp_order = 0;
+                if( !$ob->save() ) {
+                    Yii::info('Error save goodgroup: '
+                        . print_r($ob->getErrors(), true)
+                        . "\n"
+                        . print_r($ob->attributes, true)
+                    );
+                }
+            }
+        }
     }
 }

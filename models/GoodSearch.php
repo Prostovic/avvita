@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Good;
+use app\models\Goodgroup;
 
 /**
  * GoodSearch represents the model behind the search form about `app\models\Good`.
@@ -18,10 +19,10 @@ class GoodSearch extends Good
     public function rules()
     {
         return [
-            [['gd_id', 'gd_number', 'gd_active'], 'integer'],
+            [['gd_id', 'gd_number', 'gd_active', 'groupid', ], 'integer'],
             [['gd_title', 'gd_imagepath', 'gd_description', 'gd_created'], 'safe'],
             [['gd_price'], 'number'],
-            [['ordered'], 'save'],
+            [['_ordered'], 'save'],
         ];
     }
 
@@ -48,6 +49,7 @@ class GoodSearch extends Good
             ->select('ordit_gd_id, SUM(ordit_count) as ordered')
             ->groupBy('ordit_gd_id');
 
+//        Yii::info('params = ' . print_r($params, true));
         $query->leftJoin(['goodCount' => $subQuery], 'goodCount.ordit_gd_id = gd_id');
 
         $dataProvider = new ActiveDataProvider([
@@ -60,6 +62,14 @@ class GoodSearch extends Good
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if( !empty($this->groupid) ) {
+            $sFld = Goodgroup::tableName() . '.gdgrp_gd_id';
+            $query->join('INNER JOIN', Goodgroup::tableName(), $sFld . ' = gd_id');
+            $query->andFilterWhere([
+                Goodgroup::tableName() . '.gdgrp_grp_id' => $this->groupid,
+            ]);
         }
 
         $query->andFilterWhere([

@@ -30,6 +30,10 @@ class Good extends \yii\db\ActiveRecord
 
     public $groupid;
 
+    public $_ordered;
+
+    public static $_cache = [];
+
     public function behaviors()
     {
         return [
@@ -77,7 +81,7 @@ class Good extends \yii\db\ActiveRecord
             [['groupid'], 'in', 'range' => array_keys(Group::getAllgroups()), ],
             [['gd_created'], 'safe'],
             [['gd_title', 'gd_imagepath'], 'string', 'max' => 255],
-            [['file'], 'safe'],
+            [['file', '_ordered', ], 'safe'],
             [['file'], 'file', 'maxFiles' => Yii::$app->params['image.count'], 'maxSize' => Yii::$app->params['image.maxsize'], 'extensions' => Yii::$app->params['image.ext']],        ];
     }
 
@@ -97,6 +101,7 @@ class Good extends \yii\db\ActiveRecord
             'gd_created' => 'Создан',
             'items' => 'В заказах',
             'ordered' => 'Заказано',
+            '_ordered' => 'Заказано',
             'groupid' => 'Группа',
         ];
     }
@@ -160,6 +165,15 @@ class Good extends \yii\db\ActiveRecord
                 );
             }
         }
+    }
 
+    /**
+     * @return array
+     */
+    public static function getAllGoods() {
+        if( !isset(self::$_cache['all']) ) {
+            self::$_cache['all'] = self::find()->all(); // ->where(['gd_active' => 1])
+        }
+        return self::$_cache['all'];
     }
 }

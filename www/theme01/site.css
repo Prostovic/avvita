@@ -15,6 +15,12 @@ a {
     outline: 0 none;
 }
 
+.single-post-title h2 a {
+    text-decoration: none;
+    color: #aec62c;
+    outline: 0 none;
+}
+
 .navbar-default {
     background-color: #fff;
     border-color: #ccc;

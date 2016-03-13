@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use app\models\Group;
+use app\models\Good;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\GroupSearch */
@@ -48,10 +50,25 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'value' => function ($model, $key, $index, $column) {
                     /** @var $model app\models\Group */
+                    $nCou = count($model->goods);
+                    $sGoods = $nCou > 0 ?
+                        ( ' <!-- ['
+                            . $nCou
+                            . '] -->:<br />'
+                            . implode('<br />', ArrayHelper::map(
+                                $model->goods,
+                                'gd_id',
+                                function($element){
+                                    /** @var Good $element */
+                                    return Html::encode($element->gd_title);
+                                }
+                            ))
+                        ):
+                        '';
                     return Html::img($model->grp_imagepath, ['alt' => $model->grp_title, 'style' => 'float: left; margin: 0 10px 10px 0; border: 1px solid #666666;'])
                         . '<span class="glyphicon glyphicon-'.($model->grp_active ? 'ok' : 'remove') . ' right-glyth"></span>'
                         . '<strong>' . Html::encode($model->grp_title) . '</strong>'
-                        . ' [' . count($model->goods) . ']';
+                        . $sGoods;
                 },
             ],
 //            'grp_imagepath',

@@ -3,7 +3,11 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\web\View;
+use yii\helpers\ArrayHelper;
 use kartik\file\FileInput;
+use kartik\select2\Select2;
+
+use app\models\Good;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Group */
@@ -18,6 +22,23 @@ $pluginOptions = [
     'maxFileCount' => Yii::$app->params['image.count'],
     'layoutTemplates' => [
         'actions' => '{delete}',
+    ],
+];
+
+$data = ArrayHelper::map(Good::getAllGoods(), 'gd_id', 'gd_title');
+
+$optSelect2Goods = [
+    'language' => 'ru',
+    'data' => $data,
+    'pluginOptions' => [
+//        'debug' => true,
+        'allowClear' => true,
+        'minimumInputLength' => 0,
+    ],
+
+    'options' => [
+        'multiple' => true,
+        'placeholder' => 'Выберите подарки ...',
     ],
 ];
 
@@ -38,31 +59,28 @@ $pluginOptions = [
         'validateOnSubmit' => true,
     ]); ?>
 
-    <div class="col-xs-8">
-        <?= $form->field($model, 'grp_title')->textInput(['maxlength' => true]) ?>
-    </div>
+    <div class="col-xs-6">
+        <div class="col-xs-9">
+            <?= $form->field($model, 'grp_title')->textInput(['maxlength' => true]) ?>
+        </div>
 
-    <div class="col-xs-2">
-        &nbsp;
-    </div>
+        <div class="col-xs-3">
+            <?= $form->field($model, 'grp_active', ['template' => '<label class="control-label">&nbsp;</label><br />{input}{error}'])->checkbox() ?>
+        </div>
 
-    <div class="col-xs-2">
-        <?= $form->field($model, 'grp_active', ['template' => '<label class="control-label">&nbsp;</label><br />{input}{error}'])->checkbox() ?>
-    </div>
+        <?= '' // $form->field($model, 'grp_imagepath')->textInput(['maxlength' => true]) ?>
 
-    <?= '' // $form->field($model, 'grp_imagepath')->textInput(['maxlength' => true]) ?>
+        <div class="col-xs-12">
+            <?= $form->field($model, 'grp_description')->textarea(['rows' => 4]) ?>
+        </div>
 
-    <div class="col-xs-12">
-        <?= $form->field($model, 'grp_description')->textarea(['rows' => 4]) ?>
-    </div>
-
-    <div class="col-xs-12">
-        <?php
-        if( !empty($model->grp_imagepath) ) {
-            // не заморачиваемся с существующими файлами - делаем отдельные ссылки на удаление
-            $aPrev = [];
-            $aConf = [];
-            echo '<div class="row form-group">';
+        <div class="col-xs-12">
+            <?php
+            if( !empty($model->grp_imagepath) ) {
+                // не заморачиваемся с существующими файлами - делаем отдельные ссылки на удаление
+                $aPrev = [];
+                $aConf = [];
+                echo '<div class="row form-group">';
 //            foreach($aImages As $ob) {
                 /** @var Goodimg $ob */
 //            $aPrev[] =
@@ -86,7 +104,7 @@ $pluginOptions = [
 //                ],
 //            ];
 
-                echo '<div class="col-xs-4 image-edit-region">' . Html::img(
+                echo '<div class="col-xs-12 image-edit-region">' . Html::img(
                         substr(Yii::getAlias('@webroot'), strlen($_SERVER['DOCUMENT_ROOT'])) . str_replace(['/', '\\'], ['/', '/'], $model->grp_imagepath)
                     )
                     . ''
@@ -100,10 +118,10 @@ $pluginOptions = [
                     . '</div>';
 
 //            }
-            echo '</div><div class="clearfix"></div></div><div class="col-xs-12">';
+                echo '</div><div class="clearfix"></div></div><div class="col-xs-12">';
 
 //        echo '<div class="form-file-region" style="display: none;">';
-            $sJs = <<<EOT
+                $sJs = <<<EOT
 jQuery(".post-request-link-delete-file").on(
     "click",
     function(event) {
@@ -125,30 +143,35 @@ jQuery(".post-request-link-delete-file").on(
     }
 );
 EOT;
-            $this->registerJs($sJs, View::POS_READY, 'upload-file-action');
+                $this->registerJs($sJs, View::POS_READY, 'upload-file-action');
 
 //    $pluginOptions['initialPreview'] = $aPrev;
 //    $pluginOptions['initialPreviewConfig '] = $aConf;
-        }
+            }
 
-        $bMultiple = Yii::$app->params['image.count'] > 1;
-        echo $form
-            ->field(
-                $model,
-                'file',
-                ['template' => "{input}{error}"]
-            )
-            ->widget(
-                FileInput::classname(),
-                [
-                    'options' => [
-                        'multiple' => false,
-                    ],
-                    'pluginOptions' => $pluginOptions,
-                ]
-            );
+            $bMultiple = Yii::$app->params['image.count'] > 1;
+            echo $form
+                ->field(
+                    $model,
+                    'file',
+                    ['template' => "{input}{error}"]
+                )
+                ->widget(
+                    FileInput::classname(),
+                    [
+                        'options' => [
+                            'multiple' => false,
+                        ],
+                        'pluginOptions' => $pluginOptions,
+                    ]
+                );
 
-        ?>
+            ?>
+        </div>
+    </div>
+
+    <div class="col-xs-6">
+        <?= $form->field($model, '_goods')->widget(Select2::classname(), $optSelect2Goods, ['placeholder'=>$model->getAttributeLabel('_goods'), ]) ?>
     </div>
 
     <?= '' // $form->field($model, 'grp_active')->textInput() ?>

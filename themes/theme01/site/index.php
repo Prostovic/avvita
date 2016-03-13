@@ -68,9 +68,16 @@ if( Yii::$app->user->isGuest ) {
 ?>
 
 <a id="goodlist"></a>
-<?= $this->render('//good/userindex', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider,
-]);
-
+<?php
+//    echo $this->render('//good/userindex', [
+//        'searchModel' => $searchModel,
+//        'dataProvider' => $dataProvider,
+//    ]);
 ?>
+
+<?= $this->render('//group/allgroup', [
+    'searchGroup' => $searchGroup,
+    'dataGroup' => $dataGroup,
+]);
+?>
+
