@@ -163,6 +163,9 @@ class Group extends \yii\db\ActiveRecord
         return self::$_cache['list'];
     }
 
+    /**
+     * @throws \yii\db\Exception
+     */
     public function saveGoods() {
         $sSql = 'Update ' . Goodgroup::tableName()
             . ' Set gdgrp_gd_id = 0, gdgrp_grp_id = 0, gdgrp_order = 0'

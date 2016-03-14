@@ -6,6 +6,7 @@ use yii\helpers\Url;
 use yii\web\View;
 
 use kartik\file\FileInput;
+use kartik\select2\Select2;
 
 use app\models\Goodimg;
 use app\models\Group;
@@ -25,6 +26,23 @@ $pluginOptions = [
         'actions' => '{delete}',
     ],
 ];
+
+$optSelect2Groups = [
+    'language' => 'ru',
+    'data' => Group::getAllgroups(),
+    'pluginOptions' => [
+//        'debug' => true,
+        'allowClear' => true,
+        'minimumInputLength' => 0,
+    ],
+
+    'options' => [
+        'multiple' => true,
+        'placeholder' => 'Выберите группы ...',
+    ],
+];
+
+
 ?>
 
 <div class="good-form">
@@ -57,7 +75,8 @@ $pluginOptions = [
     </div>
 
     <div class="col-xs-3">
-    <?= $form->field($model, 'groupid')->dropDownList(Group::getAllgroups()) ?>
+        <?= '' // $form->field($model, 'groupid')->dropDownList(Group::getAllgroups()) ?>
+        <?= $form->field($model, '_groups')->widget(Select2::classname(), $optSelect2Groups, ['placeholder'=>$model->getAttributeLabel('_groups'), ]) ?>
     </div>
 
     <div class="col-xs-3">

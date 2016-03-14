@@ -3,6 +3,9 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use app\models\User;
+use app\models\Good;
+use app\models\Group;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\GoodSearch */
@@ -31,6 +34,21 @@ $this->params['breadcrumbs'][] = $this->title;
 //            'gd_description:ntext',
             'gd_price',
             'gd_number',
+            [
+                'class' => 'yii\grid\DataColumn',
+                'attribute' => '_groups',
+                'format' => 'raw',
+                'value' => function ($model, $key, $index, $column) {
+                    /** @var Good $model */
+                    return implode('<br />', ArrayHelper::map(
+                        $model->groups,
+                        'grp_id',
+                        function($el) {
+                            return Html::encode($el->grp_title);
+                        }
+                    ));
+                }
+            ],
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'ordered',

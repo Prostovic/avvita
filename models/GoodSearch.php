@@ -44,7 +44,7 @@ class GoodSearch extends Good
      */
     public function search($params)
     {
-        $query = Good::find()->with(['images']);
+        $query = Good::find()->with(['images', 'groups']);
         $subQuery = Orderitem::find()
             ->select('ordit_gd_id, SUM(ordit_count) as ordered')
             ->groupBy('ordit_gd_id');

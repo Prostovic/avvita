@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -110,7 +111,8 @@ class GoodController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $model->uploadFile($model->gd_id);
-            $model->saveGroup();
+//            $model->saveGroup();
+            $model->saveGroups();
             return $this->redirect(['list', ]);
 //            return $this->redirect(['view', 'id' => $model->gd_id]);
         } else {
@@ -129,6 +131,7 @@ class GoodController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->_groups = ArrayHelper::map($model->groupdata, 'gdgrp_grp_id', 'gdgrp_grp_id');
 
         if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -137,7 +140,8 @@ class GoodController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $model->uploadFile($model->gd_id);
-            $model->saveGroup();
+//            $model->saveGroup();
+            $model->saveGroups();
             return $this->redirect(['list', ]);
 //            return $this->redirect(['view', 'id' => $model->gd_id]);
         } else {
