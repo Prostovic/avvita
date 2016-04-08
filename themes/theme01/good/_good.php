@@ -47,7 +47,7 @@ $linkOptions = [
         </div>
 
         <div class="single-post-content">
-            <p><?= Html::encode($model->gd_description) ?></p>
+            <p><?= nl2br(Html::encode($model->gd_description)) ?></p>
             <?= Yii::$app->user->can(User::GROUP_CLIENT) ?
                 Html::a('<span class="glyphicon glyphicon-shopping-cart"></span> Добавить в корзину', ['userorder/append', 'id' => $model->gd_id], $linkOptions) :
                 ''
