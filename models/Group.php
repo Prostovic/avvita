@@ -125,6 +125,21 @@ class Group extends \yii\db\ActiveRecord
     }
 
     /**
+     * Удаляем файл
+     */
+    public function deleteFile() {
+        $sDir = Yii::getAlias('@webroot/images/gr');
+        if( is_dir($sDir) ) {
+            $sf = Yii::getAlias('@webroot') . $this->grp_imagepath;
+            $this->grp_imagepath = null;
+            $this->save();
+            if( file_exists($sf) ) {
+                unlink($sf);
+            }
+        }
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getGroupgoods() {

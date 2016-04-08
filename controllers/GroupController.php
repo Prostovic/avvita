@@ -33,7 +33,7 @@ class GroupController extends Controller
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'view', 'create', 'update', 'delete', 'list', 'goods', ],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'deletefile', 'list', 'goods', ],
                 'rules' => [
                     [
                         'allow' => true,
@@ -42,7 +42,7 @@ class GroupController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['create', 'update', 'delete', 'list', ],
+                        'actions' => ['create', 'update', 'delete', 'list', 'deletefile', ],
                         'roles' => [User::GROUP_OPERATOR],
                     ],
                 ],
@@ -185,7 +185,7 @@ class GroupController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+//        $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
     }
@@ -229,6 +229,19 @@ class GroupController extends Controller
         }
 
         return $this->redirect(['list']);
+    }
+
+    /**
+     * @param integer $id
+     * @return Response
+     */
+    public function actionDeletefile($id)
+    {
+        $model = $this->findModel($id);
+        $model->deleteFile();
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return [];
     }
 
     /**
