@@ -76,7 +76,7 @@ class GoodSearch extends Good
             'gd_id' => $this->gd_id,
             'gd_price' => $this->gd_price,
             'gd_number' => $this->gd_number,
-            'gd_active' => $this->gd_active,
+            'gd_active' => self::GOOD_ACTIVE_FLAG,
             'gd_created' => $this->gd_created,
         ]);
 

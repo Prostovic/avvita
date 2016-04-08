@@ -160,6 +160,9 @@ class GoodController extends Controller
     public function actionDelete($id)
     {
 //        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->gd_active = Good::GOOD_DELETED_FLAG;
+        $model->save();
         return $this->redirect(['index']);
     }
 

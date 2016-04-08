@@ -27,6 +27,9 @@ use yii\helpers\ArrayHelper;
  */
 class Good extends \yii\db\ActiveRecord
 {
+    const GOOD_DELETED_FLAG = 1;
+    const GOOD_ACTIVE_FLAG = 0;
+
     public $file = null;
 
     public $groupid;
