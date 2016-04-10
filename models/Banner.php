@@ -133,4 +133,16 @@ class Banner extends \yii\db\ActiveRecord
             ->createCommand('Select Distinct bnr_group From ' . self::tableName() . ' Order By bnr_group')
             ->queryAll(\PDO::FETCH_ASSOC);
     }
+
+    /*
+     *
+     */
+    public static function getGroupBanner($sGroup = '') {
+        return self::find()
+            ->where([
+                'bnr_group' => $sGroup,
+                'bnr_active' => 1,
+            ])
+            ->all();
+    }
 }

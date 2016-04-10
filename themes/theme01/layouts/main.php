@@ -15,6 +15,9 @@ use yii\bootstrap\Modal;
 use app\assets\Theme01Asset;
 use app\models\User;
 
+use app\components\CarouselWidget;
+use app\models\Banner;
+
 Theme01Asset::register($this);
 
 $sJs = <<<EOT
@@ -74,6 +77,11 @@ $this->registerJs($sJs, View::POS_READY);
 <?php
     }
     else {
+        echo CarouselWidget::widget([
+            'models' => Banner::getGroupBanner('Карусель на главной'),
+            'view' => '//site/carousel-top'
+        ]);
+/*
         $aCarousel = [
             [
                 'title' => 'Смотрим сюда',
@@ -116,6 +124,7 @@ $this->registerJs($sJs, View::POS_READY);
                 ['class' => 'container']
             );
         }
+*/
 /*
 <div class="container">
     <div class="row">
@@ -128,6 +137,7 @@ $this->registerJs($sJs, View::POS_READY);
     </div>
 </div>
 */
+/*
         $sDop = substr(Yii::getAlias('@webroot'), strlen($_SERVER['DOCUMENT_ROOT']));
         echo '<section id="main-slider" class="no-margin">';
         echo Carousel::widget([
@@ -160,6 +170,7 @@ $this->registerJs($sJs, View::POS_READY);
             ]
         ]);
         echo '</section>';
+*/
 //    echo '<p>' . Yii::$app->defaultRoute . ' == ' . Yii::$app->controller->getRoute() . '</p>';
 /*
         <section class="no-margin" id="main-slider">

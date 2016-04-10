@@ -37,3 +37,5 @@ phpunit.phar
 /www/assets
 /www/images/gd
 /www/images/gr
+/www/images/rotate
+/www/theme01/top-10-1.jpg
