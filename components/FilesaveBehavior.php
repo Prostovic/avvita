@@ -101,7 +101,7 @@ class FilesaveBehavior extends Behavior {
             $sName = $this->filesaveFilenamePrefix . $ob->name;
             $sFullName = $this->filesaveCreateFullPath === null ?
                 $this->getFullpath($sName) :
-                $this->filesaveCreateFullPath($this->filesaveBaseDirName, $sName, $parentModelId);
+                call_user_func($this->filesaveCreateFullPath, $this->filesaveBaseDirName, $sName, $parentModelId);
 
             $upCount = 1;
             while( file_exists($sFullName) ) {
@@ -129,7 +129,7 @@ class FilesaveBehavior extends Behavior {
 
                 $sFullName = $this->filesaveCreateFullPath === null ?
                     $this->getFullpath($sName) :
-                    $this->filesaveCreateFullPath($this->filesaveBaseDirName, $sName, $parentModelId);
+                    call_user_func($this->filesaveCreateFullPath, $this->filesaveBaseDirName, $sName, $parentModelId);
                 $upCount++;
 //                Yii::info('New file name: ' . $sFullName . ' ('.$upCount.')');
             }
@@ -216,6 +216,9 @@ class FilesaveBehavior extends Behavior {
         if( !is_dir($sDir) && !@mkdir($sDir) ) {
             Yii::info('Does not exists directory ' . $sDir . ' ('.$sFilename.')');
             return null;
+        }
+        else {
+            chmod($sDir, 0777);
         }
         return $sDir . DIRECTORY_SEPARATOR . $sFilename;
     }
