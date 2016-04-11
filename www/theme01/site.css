@@ -391,10 +391,12 @@ h2 {
     line-height: 1.5em;
     margin: 30px 0 0;
 }
+
 .single-post-title h2 {
     border-bottom: 1px dotted #828282;
     font-size: 36px;
     margin: 0 0 10px;
+    overflow: hidden;
 }
 
 .single-post-info i {

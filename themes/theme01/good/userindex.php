@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\ListView;
+use yii\web\View;
 use app\models\User;
 use app\models\Orderitem;
 
@@ -51,12 +52,32 @@ $columns = [
         'layout' => "{items}\n{pager}",
         'itemView' => '_good',
         'options' => [
-            'class' => "good-index row",
+//            'tag' => '',
+//            'class' => "good-index row",
         ],
         'itemOptions' => [
-            'class' => "col-sm-6",
+//            'class' => "col-sm-6",
+            'tag' => false,
         ],
 //        'filterModel' => $searchModel,
     ]); ?>
 
+<?php
+
+$sJs = <<<EOT
+jQuery(".single-post-title h2").each(function(index, el){
+    var ob = jQuery(this),
+        nCur = ob.height();
+    if( nCur > 54 ) {
+        ob
+            .height(54)
+            .hover(function(event){ ob.height(nCur); }, function(event){ ob.height(54); });
+    }
+});
+
+EOT;
+
+$this->registerJs($sJs, View::POS_READY);
+
+?>
 <!-- /div -->

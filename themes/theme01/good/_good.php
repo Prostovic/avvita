@@ -14,9 +14,13 @@ $linkOptions = [
     'title' => 'Добавить в корзину: ' . $model->gd_title,
     'class' =>'btn'
 ];
+
+if( ($index > 0) && ($index % 2 == 0) ) {
+    echo "\n" . '<div class="clearfix"></div>';
+}
 ?>
 
-<!-- div class="col-sm-6" -->
+<div class="col-sm-6">
     <div class="blog-post blog-single-post">
         <div class="single-post-title">
             <h2><?= Html::encode($model->gd_title) ?></h2>
@@ -55,4 +59,5 @@ $linkOptions = [
         <?php // <a class="btn" href="blog-post.html">Read more</a> ?>
         </div>
     </div>
-<!-- /div -->
+</div>
+
