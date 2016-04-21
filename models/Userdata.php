@@ -57,7 +57,7 @@ class Userdata extends \yii\db\ActiveRecord
                             $model, // $aExists,
                             'duplicateorder_mail'
                         );
-                        $oNotify->notifyMail('Вы проверены на портале "' . Yii::$app->name . '"');
+                        $oNotify->notifyMail('Повторный выбор заказа на сайте "' . Yii::$app->name . '"');
                     }
                 },
             ],

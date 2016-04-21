@@ -67,11 +67,16 @@ $columns = [
 $sJs = <<<EOT
 jQuery(".single-post-title h2").each(function(index, el){
     var ob = jQuery(this),
-        nCur = ob.height();
-    if( nCur > 54 ) {
+        nCur = ob.height(),
+        nMinHeight = 108;
+    if( nCur > nMinHeight ) {
         ob
-            .height(54)
-            .hover(function(event){ ob.height(nCur); }, function(event){ ob.height(54); });
+            .height(nMinHeight)
+            .hover(function(event){ ob.height(nCur); }, function(event){ ob.height(nMinHeight); });
+    }
+    else {
+        ob
+            .height(nMinHeight);
     }
 });
 

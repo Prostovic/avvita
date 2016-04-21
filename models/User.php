@@ -53,6 +53,10 @@ class User extends ActiveRecord implements IdentityInterface
     public $isAgree;
     public $password = '';
 
+    public $docSumm = 0;
+    public $orderSumm = 0;
+    public $commonSumm = 0;
+
 
     public function behaviors() {
         return [
@@ -517,4 +521,62 @@ class User extends ActiveRecord implements IdentityInterface
         }
         return $aGroups[$sKey];
     }
+
+
+    /**
+     * Связь с табличкой на сопоставление заказа и пользователя
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserdata() {
+        return $this->hasMany(
+            Userdata::className(),
+            ['ud_us_id' => 'us_id', ]
+        );
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDocdata() {
+        return $this->hasMany(Docdata::className(), ['doc_id' => 'ud_doc_id'])->via('userdata');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrders() {
+        return $this->hasMany(
+            Userorder::className(),
+            ['ord_us_id' => 'us_id']
+        );
+    }
+
+    /**
+     *
+     */
+    public function getSumdocQuery($aCond = []) {
+        $query = self::find()
+            ->leftJoin(Userdata::tableName(), 'ud_us_id=us_id')
+            ->leftJoin(Docdata::tableName(), 'doc_key=ud_doc_key')
+            ->leftJoin(Userorder::tableName(), 'ord_us_id=us_id')
+            ->select(
+                [
+                    self::tableName().'.*',
+                    'SUM('.Docdata::tableName().'.doc_summ) AS docSumm',
+                    'SUM('.Userorder::tableName().'.ord_summ) AS orderSumm',
+//                    'docSumm - orderSumm AS commonSumm',
+                ]
+            )
+            ->groupBy(self::tableName().'.us_id');
+        return $query;
+
+//            ->where(
+//                [
+//                    'and',
+//                    [self::tableName().'.us_group' => User::GROUP_CLIENT, ],
+//                    ['not in', 'us_group', [User::GROUP_DELETED], ],
+//                ]
+//            )
+    }
+
 }

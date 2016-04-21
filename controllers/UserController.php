@@ -36,7 +36,7 @@ class UserController extends Controller
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'view', 'confirmemail', 'register', 'testuserdata', 'update', 'profile'],
+                'only' => ['index', 'view', 'confirmemail', 'register', 'testuserdata', 'update', 'points', 'profile'],
                 'rules' => [
                     [
                         'allow' => true,
@@ -45,7 +45,7 @@ class UserController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['index', 'view', 'testuserdata', 'update', 'profile', ],
+                        'actions' => ['index', 'view', 'testuserdata', 'update', 'profile', 'points', ],
                         'roles' => [User::GROUP_OPERATOR],
                     ],
                     [
@@ -68,6 +68,21 @@ class UserController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all User models with orders and pionts.
+     * @return mixed
+     */
+    public function actionPoints($id = 0)
+    {
+        $searchModel = new UserSearch();
+        $dataProvider = $searchModel->searchWithData(Yii::$app->request->queryParams);
+
+        return $this->render('points', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
