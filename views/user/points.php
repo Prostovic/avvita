@@ -48,7 +48,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'value' => function($model, $key, $index, $column) {
                     /** @var User $model */
-                    return $model->docSumm . '<br />' . $model->orderSumm . '<br />' . ($model->docSumm - $model->orderSumm);
+                    return
+                        ($model->docSumm > 0 ? Html::a('Начислено', ['userdata/index', 'UserdataSearch' => ['ud_us_id' => $model->us_id]]) : 'Начислено')
+                        . ': '
+                        . (empty($model->docSumm) ? '-' : $model->docSumm)
+                        . '<br />'
+                        . ($model->orderSumm > 0 ? Html::a('Потрачено', ['userdata/index', 'UserdataSearch' => ['ud_us_id' => $model->us_id]]) : 'Потрачено')
+                        . ': '
+                        . (empty($model->orderSumm) ? '-' : $model->orderSumm)
+                        . '<br />'
+                        . 'Итог: ' . ($model->docSumm - $model->orderSumm);
                 },
             ],
         ],

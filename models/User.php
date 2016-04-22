@@ -247,6 +247,7 @@ class User extends ActiveRecord implements IdentityInterface
             'us_group' => 'Группа',
             'isAgree' => 'Согласие на обработку данных',
             'us_op_key' => 'Ключ на действия',
+            'docSumm' => 'Начисления',
         ];
     }
 
