@@ -557,14 +557,14 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getSumdocQuery($aCond = []) {
         $query = self::find()
-            ->leftJoin(Userdata::tableName(), 'ud_us_id=us_id')
-            ->leftJoin(Docdata::tableName(), 'doc_key=ud_doc_key')
-            ->leftJoin(Userorder::tableName(), 'ord_us_id=us_id')
+            ->leftJoin('(Select ud.ud_us_id, SUM(dd.doc_summ) AS docSumm From avit_userdata ud, avit_docdata dd Where dd.doc_key=ud.ud_doc_key Group By ud.ud_us_id) td', 'td.ud_us_id = avit_user.us_id')
+            ->leftJoin('(Select uo.ord_us_id, SUM(uo.ord_summ) AS orderSumm From avit_userorder uo Group By uo.ord_us_id) tord', 'tord.ord_us_id = avit_user.us_id')
+//            ->leftJoin(Userorder::tableName(), 'ord_us_id=us_id')
             ->select(
                 [
                     self::tableName().'.*',
-                    'SUM('.Docdata::tableName().'.doc_summ) AS docSumm',
-                    'SUM('.Userorder::tableName().'.ord_summ) AS orderSumm',
+                    'td.docSumm',
+                    'tord.orderSumm',
 //                    'docSumm - orderSumm AS commonSumm',
                 ]
             )

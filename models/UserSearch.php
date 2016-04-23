@@ -131,11 +131,12 @@ class UserSearch extends User
 
         $query->andFilterWhere(['not in', 'us_group', [User::GROUP_DELETED] ]);
 
-        $query->andFilterWhere(['like', 'us_fam', $this->us_fam])
-            ->andFilterWhere(['like', 'us_name', $this->us_name])
-            ->andFilterWhere(['like', 'us_otch', $this->us_otch])
-            ->andFilterWhere(['like', 'us_email', $this->us_email])
-            ->andFilterWhere(['like', 'us_phone', $this->us_phone])
+        $query
+//            ->andFilterWhere(['like', 'us_fam', $this->us_fam])
+//            ->andFilterWhere(['like', 'us_name', $this->us_name])
+//            ->andFilterWhere(['like', 'us_otch', $this->us_otch])
+//            ->andFilterWhere(['like', 'us_email', $this->us_email])
+//            ->andFilterWhere(['like', 'us_phone', $this->us_phone])
             ->andFilterWhere(['like', 'us_adr_post', $this->us_adr_post])
             ->andFilterWhere(['like', 'us_pass', $this->us_pass])
             ->andFilterWhere(['like', 'us_city', $this->us_city])
@@ -143,6 +144,24 @@ class UserSearch extends User
             ->andFilterWhere(['like', 'us_city_id', $this->us_city_id])
             ->andFilterWhere(['like', 'us_org_id', $this->us_org_id]);
 
+        if( !empty($this->us_fam) ) {
+            $aParts = mb_split(' ', $this->us_fam);
+            $aNameFilter = ['or'];
+            foreach($aParts As $v) {
+                $v = trim($v);
+                if( empty($v) ) {
+                    continue;
+                }
+                $aNameFilter[] = ['like', 'us_fam', $v];
+                $aNameFilter[] = ['like', 'us_name', $v];
+                $aNameFilter[] = ['like', 'us_otch', $v];
+                $aNameFilter[] = ['like', 'us_email', $v];
+                $aNameFilter[] = ['like', 'us_phone', $v];
+            }
+            if( count($aNameFilter) > 0 ) {
+                $query->andFilterWhere($aNameFilter);
+            }
+        }
         return $dataProvider;
     }
 }

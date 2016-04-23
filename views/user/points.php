@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         . ': '
                         . (empty($model->docSumm) ? '-' : $model->docSumm)
                         . '<br />'
-                        . ($model->orderSumm > 0 ? Html::a('Потрачено', ['userdata/index', 'UserdataSearch' => ['ud_us_id' => $model->us_id]]) : 'Потрачено')
+                        . ($model->orderSumm > 0 ? Html::a('Потрачено', ['userorder/index', 'UserorderSearch' => ['ord_us_id' => $model->us_id]]) : 'Потрачено')
                         . ': '
                         . (empty($model->orderSumm) ? '-' : $model->orderSumm)
                         . '<br />'

@@ -101,6 +101,25 @@ if( $bOperator ) {
         ]
     ) ?>
 
+    <?php if( $bOperator && (count($model->goods) > 0) ) {
+        if( $model->ord_flag == Userorder::ORDER_FLAG_COMPLETED ) {
+        ?>
+            <p>
+                <?= Html::a('Отметить отправленным', ['userorder/send', 'id' => $model->ord_id], ['class' => 'btn btn-success', 'data-method' => 'post',]) ?>
+                <?= Html::a('Вернуть клиенту на комплектование', ['userorder/toedit', 'id' => $model->ord_id], ['class' => 'btn btn-success', 'data-method' => 'post',]) ?>
+            </p>
+        <?php
+        }
+        else if( $model->ord_flag == Userorder::ORDER_FLAG_SENDED ) {
+        ?>
+            <p>Заказ отправлен пользователю</p>
+        <?php
+        }
+    ?>
+        <p><?php echo Html::encode($model->user->getUserName()); ?></p>
+    <?php } ?>
+
+
     <p>
         <?= '' // Html::a('Изменить', ['update', 'id' => $model->ord_id], ['class' => 'btn btn-success']) ?>
         <?= '' /*Html::a('Delete', ['delete', 'id' => $model->ord_id], [

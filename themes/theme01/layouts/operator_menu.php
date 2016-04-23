@@ -54,11 +54,14 @@ echo Nav::widget([
         [
             'label' => 'Пользователи',
             'items' => [
+                ['label' => 'Начисления', 'url' => ['user/points']],
+                '<li class="dropdown-header">Список с баллами</li>',
+                '<li class="divider"></li>',
                 ['label' => 'Список', 'url' => ['user/index']],
                 '<li class="dropdown-header">Все пользователи системы</li>',
                 '<li class="divider"></li>',
                 ['label' => 'Непроверенные', 'url' => ['user/index', 'UserSearch[us_group]' => 'confitmed', ]],
-                '<li class="dropdown-header">Непрверенные пользователи</li>',
+                '<li class="dropdown-header">Непроверенные пользователи</li>',
                 '<li class="divider"></li>',
                 ['label' => 'Добавить оператора', 'url' => ['user/create']],
                 '<li class="dropdown-header">Добавить опреатора</li>',
