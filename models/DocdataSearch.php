@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Docdata;
+use app\components\Orderhelper;
 
 /**
  * DocdataSearch represents the model behind the search form about `app\models\Docdata`.
@@ -72,6 +73,51 @@ class DocdataSearch extends Docdata
         $query->andFilterWhere(['like', 'doc_key', $this->doc_key])
             ->andFilterWhere(['like', 'doc_ordernum', $this->doc_ordernum])
             ->andFilterWhere(['like', 'doc_fullordernum', $this->doc_fullordernum])
+            ->andFilterWhere(['like', 'doc_title', $this->doc_title]);
+
+        return $dataProvider;
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function bonusSearch($params)
+    {
+        $query = Docdata::find();
+
+//        $query->with([
+//            'org'
+//        ]);
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->andFilterWhere([
+            'doc_id' => $this->doc_id,
+            'doc_date' => $this->doc_date,
+            'doc_org_id' => $this->doc_org_id,
+            'doc_number' => $this->doc_number,
+            'doc_summ' => $this->doc_summ,
+            'doc_created' => $this->doc_created,
+        ]);
+
+        $query->andFilterWhere(['like', 'doc_key', $this->doc_key])
+                ->andFilterWhere(['like', 'SUBSTR(doc_key, 0, '.strlen(Orderhelper::DOC_BONUS_PREFIX).')', Orderhelper::DOC_BONUS_PREFIX])
+//            ->andFilterWhere(['like', 'doc_ordernum', $this->doc_ordernum])
+//            ->andFilterWhere(['like', 'doc_fullordernum', $this->doc_fullordernum])
             ->andFilterWhere(['like', 'doc_title', $this->doc_title]);
 
         return $dataProvider;

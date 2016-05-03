@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\components\Orderhelper;
 use Yii;
 use app\models\Docdata;
 use app\models\DocdataSearch;
@@ -98,9 +99,45 @@ class DocdataController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+//        $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function actionAddbonus()
+    {
+        $model = new Docdata();
+        $uid = Yii::$app->request->getQueryParam('uid', 0);
+
+        if( $model->load(Yii::$app->request->post()) ) {
+            Orderhelper::setBonusFields($model);
+            $uid = Yii::$app->request->getBodyParam('uid', 0);
+            if( ($uid > 0) && $model->save() ) {
+                return $this->redirect(['view', 'id' => $model->doc_id]);
+            }
+        }
+
+        return $this->render('addbonus', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function actionBonusindex()
+    {
+        $searchModel = new DocdataSearch();
+        $dataProvider = $searchModel->bonusSearch(Yii::$app->request->queryParams);
+
+        return $this->render('bonusindex', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+
     }
 
     /**

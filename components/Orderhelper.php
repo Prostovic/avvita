@@ -26,6 +26,8 @@ class Orderhelper {
 
     const ACTIVE_ORDER_DATA_KEY = 'active_order_data'; // ключ данных по активному заказу
 
+    const DOC_BONUS_PREFIX = 'b-'; // префикс для добавленных вручную баллов для пользователей
+
     /**
      * @param Userorder $model
      * @param integer $id good id
@@ -325,5 +327,15 @@ class Orderhelper {
             'summ' => $nSumm,
             'available' => self::calculateUserMoney(Yii::$app->user->getId(), self::CALC_TYPE_BOTH),
         ];
+    }
+
+    /**
+     * @param Docdata $model
+     */
+    public static function setBonusFields(&$model) {
+        $sKey = self::DOC_BONUS_PREFIX . '';
+        $model->doc_key = $sKey;
+        $model->doc_ordernum = $sKey;
+        $model->doc_fullordernum = $sKey;
     }
 }
