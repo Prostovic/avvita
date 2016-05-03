@@ -8,6 +8,8 @@ use yii\db\Expression;
 use yii\db\ActiveRecord;
 
 use app\models\Org;
+use app\models\User;
+use app\models\Userdata;
 
 /**
  * This is the model class for table "{{%docdata}}".
@@ -25,6 +27,9 @@ use app\models\Org;
  */
 class Docdata extends \yii\db\ActiveRecord
 {
+    public $_user;
+
+    const DOC_BONUS_PREFIX = 'b-'; // префикс для добавленных вручную баллов для пользователей
 
     public function behaviors()
     {
@@ -80,6 +85,7 @@ class Docdata extends \yii\db\ActiveRecord
             'doc_number' => 'Кол-во',
             'doc_summ' => 'Баллы',
             'doc_created' => 'Создан',
+            '_user' => 'Пользователь',
         ];
     }
 
@@ -89,4 +95,14 @@ class Docdata extends \yii\db\ActiveRecord
     public function getOrg() {
         return $this->hasOne(Org::className(), ['org_key' => 'doc_org_id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser() {
+        return $this->hasOne(
+            User::className(), ['us_id' => 'ud_us_id']
+        )->viaTable(Userdata::tableName(), ['ud_doc_key' => 'doc_key']);
+    }
+
 }

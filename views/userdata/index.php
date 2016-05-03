@@ -5,6 +5,7 @@ use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 
 use app\models\User;
+use app\models\Docdata;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserdataSearch */
@@ -19,7 +20,14 @@ $columns = [
 //            ['class' => 'yii\grid\SerialColumn'],
 //
 //            'ud_id',
-    'ud_doc_key',
+//    'ud_doc_key',
+    [
+        'class' => 'yii\grid\DataColumn',
+        'attribute' => 'ud_doc_key',
+        'value' => function ($model, $key, $index, $column) {
+            return (count($model->docs) == 1) && $model->docs[0]->doc_org_id == -1 ? $model->docs[0]->doc_title : $model->ud_doc_key;
+        }
+    ],
     [
         'class' => 'yii\grid\DataColumn',
         'attribute' => 'ud_created',

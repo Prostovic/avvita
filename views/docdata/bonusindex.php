@@ -17,8 +17,16 @@ $columns = [
 //    ['class' => 'yii\grid\SerialColumn'],
 
 //    'doc_id',
-    'doc_key',
+//    'doc_key',
     'doc_date',
+    'doc_title',
+    [
+        'class' => 'yii\grid\DataColumn',
+        'attribute' => '_user',
+        'value' => function ($model, $key, $index, $column) {
+            return ($model->user !== null) ? Html::encode($model->user->userName) : '';
+        }
+    ],
 //    'doc_ordernum',
 //    'doc_fullordernum',
 //    [
@@ -35,12 +43,14 @@ $columns = [
     // 'doc_summ',
     // 'doc_created',
 
-    ['class' => 'yii\grid\ActionColumn'],
+    [
+        'class' => 'yii\grid\ActionColumn',
+        'template' => '{view} {delete}',
+    ],
 ];
 
 ?>
 <div class="docdata-index">
-
     <!-- h1><?= '' // Html::encode($this->title) ?></h1 -->
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 

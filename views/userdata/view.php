@@ -7,7 +7,8 @@ use app\models\Docdata;
 /* @var $this yii\web\View */
 /* @var $model app\models\Userdata */
 
-$this->title = 'Состав заказа ' . $model->ud_doc_key;
+$bDop = (count($model->docs) == 1) && ($model->docs[0]->doc_org_id == -1);
+$this->title = 'Состав заказа ' . ($bDop ? $model->docs[0]->doc_title : $model->ud_doc_key);
 $this->params['breadcrumbs'][] = ['label' => 'Заказы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 /*
@@ -42,7 +43,7 @@ if( count($model->docs) > 0 ) {
         . '</th></tr>';
     $sItems .= array_reduce(
         $model->docs,
-        function($res, $item) {
+        function($res, $item) use($bDop) {
             /** @var Docdata $item */
             return $res
             . '<tr><td>'
@@ -50,9 +51,9 @@ if( count($model->docs) > 0 ) {
             . '</td><td>'
             . $item->doc_title
             . '</td><td>'
-            . $item->doc_fullordernum
+            . ($bDop ? '' : $item->doc_fullordernum)
             . '</td><td>'
-            . $item->doc_ordernum
+            . ($bDop ? '' : $item->doc_ordernum)
             . '</td><td>'
             . $item->doc_summ
             . '</td></tr>'

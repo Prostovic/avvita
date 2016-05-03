@@ -89,9 +89,9 @@ class DocdataSearch extends Docdata
     {
         $query = Docdata::find();
 
-//        $query->with([
-//            'org'
-//        ]);
+        $query->with([
+            'org', 'user'
+        ]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -115,7 +115,7 @@ class DocdataSearch extends Docdata
         ]);
 
         $query->andFilterWhere(['like', 'doc_key', $this->doc_key])
-                ->andFilterWhere(['like', 'SUBSTR(doc_key, 0, '.strlen(Orderhelper::DOC_BONUS_PREFIX).')', Orderhelper::DOC_BONUS_PREFIX])
+                ->andFilterWhere(['like', 'SUBSTR(doc_key, 1, '.strlen(self::DOC_BONUS_PREFIX).')', self::DOC_BONUS_PREFIX])
 //            ->andFilterWhere(['like', 'doc_ordernum', $this->doc_ordernum])
 //            ->andFilterWhere(['like', 'doc_fullordernum', $this->doc_fullordernum])
             ->andFilterWhere(['like', 'doc_title', $this->doc_title]);

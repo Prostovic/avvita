@@ -12,6 +12,7 @@ use yii;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\db\Expression;
 
 use app\models\Userorder;
 use app\models\Orderitem;
@@ -25,8 +26,6 @@ class Orderhelper {
     const CALC_TYPE_BOTH = 2; // итоговая сумма - разность между начисленными и потраченными балами в выполненных заказах
 
     const ACTIVE_ORDER_DATA_KEY = 'active_order_data'; // ключ данных по активному заказу
-
-    const DOC_BONUS_PREFIX = 'b-'; // префикс для добавленных вручную баллов для пользователей
 
     /**
      * @param Userorder $model
@@ -332,10 +331,12 @@ class Orderhelper {
     /**
      * @param Docdata $model
      */
-    public static function setBonusFields(&$model) {
-        $sKey = self::DOC_BONUS_PREFIX . '';
+    public static function setBonusFields(&$model, $nKey) {
+        $sKey = Docdata::DOC_BONUS_PREFIX . $nKey;
         $model->doc_key = $sKey;
         $model->doc_ordernum = $sKey;
         $model->doc_fullordernum = $sKey;
+        $model->doc_number = 1;
+        $model->doc_date = date('Y-m-d H:i:s');
     }
 }

@@ -6,9 +6,11 @@ use app\components\Orderhelper;
 use Yii;
 use app\models\Docdata;
 use app\models\DocdataSearch;
+use yii\db\Expression;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\Userdata;
 
 /**
  * DocdataController implements the CRUD actions for Docdata model.
@@ -99,9 +101,16 @@ class DocdataController extends Controller
      */
     public function actionDelete($id)
     {
-//        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->delete();
+        if( $model->user !== null ) {
+            $udModel = Userdata::find()->where(['ud_us_id' => $model->user->us_id, 'ud_doc_key' => $model->doc_key])->one();
+            if( $udModel !== null ) {
+                $udModel->delete();
+            }
+        }
 
-        return $this->redirect(['index']);
+        return $this->redirect(['bonusindex']);
     }
 
     /**
@@ -111,17 +120,48 @@ class DocdataController extends Controller
     {
         $model = new Docdata();
         $uid = Yii::$app->request->getQueryParam('uid', 0);
+        $comment = '';
 
         if( $model->load(Yii::$app->request->post()) ) {
-            Orderhelper::setBonusFields($model);
-            $uid = Yii::$app->request->getBodyParam('uid', 0);
-            if( ($uid > 0) && $model->save() ) {
-                return $this->redirect(['view', 'id' => $model->doc_id]);
+            $uid = Yii::$app->request->getBodyParam('uid', null);
+            $comment = Yii::$app->request->getBodyParam('comment', '');
+            $nLen = strlen(Docdata::DOC_BONUS_PREFIX);
+            $nMax = Yii::$app->db->createCommand('Select MAX(CAST(SUBSTR(doc_key, '.($nLen+1).') As UNSIGNED)) From '.Docdata::tableName().' Where SUBSTR(doc_key, 1, '.$nLen.') = :prefix', [':prefix' => Docdata::DOC_BONUS_PREFIX])->queryScalar();
+            if( $nMax === null ) {
+                $nMax = 0;
+            }
+            $model->doc_title = $comment;
+            $model->doc_org_id = -1;
+
+            if( !empty($uid) ) {
+
+                foreach($uid As $id) {
+                    $nMax += 1;
+                    $model_gr = new Docdata();
+                    $model_gr->attributes = $model->attributes;
+                    Orderhelper::setBonusFields($model_gr, $nMax);
+                    if( !$model_gr->save() ) {
+                        Yii::error('Error save dop bonus: ' . print_r($model_gr->getErrors(), true) . ' attributes = ' . print_r($model_gr->attributes, true) );
+                        continue;
+                    }
+                    $oUserdata = new Userdata();
+//                    $oUserdata->loadDefaultValues();
+                    $oUserdata->ud_doc_id = 0;
+                    $oUserdata->ud_us_id = $id;
+                    $oUserdata->ud_doc_key = $model_gr->doc_key;
+                    if( !$oUserdata->save() ) {
+                        Yii::error('Error save dop user bonus: ' . print_r($oUserdata->getErrors(), true) . ' attributes = ' . print_r($oUserdata->attributes, true) );
+                        $model_gr->delete();
+                    }
+                }
+                return $this->redirect(['bonusindex', ]);
             }
         }
 
         return $this->render('addbonus', [
             'model' => $model,
+            'uid' => $uid,
+            'comment' => $comment,
         ]);
     }
 
