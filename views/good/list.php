@@ -36,8 +36,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'gd_number',
             [
                 'class' => 'yii\grid\DataColumn',
-                'attribute' => '_groups',
+                'attribute' => 'groupid',
                 'format' => 'raw',
+                'filter' => Group::getAllgroups(),
                 'value' => function ($model, $key, $index, $column) {
                     /** @var Good $model */
                     return implode('<br />', ArrayHelper::map(

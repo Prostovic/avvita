@@ -19,7 +19,7 @@ class GoodSearch extends Good
     public function rules()
     {
         return [
-            [['gd_id', 'gd_number', 'gd_active', 'groupid', ], 'integer'],
+            [['gd_id', 'gd_number', 'gd_active', 'groupid', '_groups',], 'integer'],
             [['gd_title', 'gd_imagepath', 'gd_description', 'gd_created'], 'safe'],
             [['gd_price'], 'number'],
             [['_ordered'], 'save'],
@@ -51,6 +51,7 @@ class GoodSearch extends Good
 
 //        Yii::info('params = ' . print_r($params, true));
         $query->leftJoin(['goodCount' => $subQuery], 'goodCount.ordit_gd_id = gd_id');
+//        $query->joinWith('groupdata');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
