@@ -281,13 +281,29 @@ class Orderhelper {
      * @return array
      */
     public static function getActiveOrderData($bRecalc = false) {
+        $aData = [];
         if( $bRecalc || !Yii::$app->session->has(self::ACTIVE_ORDER_DATA_KEY) ) {
+            $aData = self::calcActiveData();
             Yii::$app->session->set(
                 self::ACTIVE_ORDER_DATA_KEY,
-                self::calcActiveData()
+                $aData
             );
         }
-        return Yii::$app->session->get(self::ACTIVE_ORDER_DATA_KEY);
+        else {
+//            $aData = Yii::$app->session->get(self::ACTIVE_ORDER_DATA_KEY);
+            $aData = self::calcActiveData();
+//            if( !isset($aData['calctime']) ) {
+//                $aData = self::calcActiveData();
+//            }
+//            else {
+//
+//            }
+            Yii::$app->session->set(
+                self::ACTIVE_ORDER_DATA_KEY,
+                $aData
+            );
+        }
+        return $aData;
     }
 
     /**
@@ -325,6 +341,7 @@ class Orderhelper {
             'goodcount' => $nCou,
             'summ' => $nSumm,
             'available' => self::calculateUserMoney(Yii::$app->user->getId(), self::CALC_TYPE_BOTH),
+            'calctime' => time(),
         ];
     }
 
