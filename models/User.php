@@ -518,7 +518,7 @@ class User extends ActiveRecord implements IdentityInterface
         static $aGroups = [];
         $sKey = is_array($sType) ? implode('_', asort($sType)) : $sType;
         if( !isset($aGroups[$sKey]) ) {
-            $aGroups[$sKey] = self::find()->where(['us_group' => $sType])->all();
+            $aGroups[$sKey] = self::find()->where(['us_group' => $sType])->orderBy(['us_fam' => 'ASC', 'us_name' => 'ASC', 'us_otch' => 'ASC',])->all();
         }
         return $aGroups[$sKey];
     }

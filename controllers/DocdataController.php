@@ -4,13 +4,16 @@ namespace app\controllers;
 
 use app\components\Orderhelper;
 use Yii;
-use app\models\Docdata;
-use app\models\DocdataSearch;
+Use yii\filters\AccessControl;
 use yii\db\Expression;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+
 use app\models\Userdata;
+use app\models\Docdata;
+use app\models\DocdataSearch;
+use app\models\User;
 
 /**
  * DocdataController implements the CRUD actions for Docdata model.
@@ -20,6 +23,27 @@ class DocdataController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'create', 'delete', ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', ],
+                        'roles' => [User::GROUP_OPERATOR, ],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create', 'view', ],
+                        'roles' => [User::GROUP_OPERATOR, ],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete', ],
+                        'roles' => [User::GROUP_OPERATOR, ],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
