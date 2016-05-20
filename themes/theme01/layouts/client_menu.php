@@ -50,7 +50,8 @@ echo Nav::widget([
         [
             'label' => 'Подарки',
             'items' => [
-                ['label' => 'Все подарки', 'url' => ['good/index']],
+                ['label' => 'Все подарки', 'url' => ['group/allgroup']],
+//                ['label' => 'Все подарки', 'url' => ['good/index']],
                 '<li class="dropdown-header">Все подарки в системе</li>',
                 '<li class="divider"></li>',
                 ['label' => 'Заказанные', 'url' => ['userorder/list', ]],

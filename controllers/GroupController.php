@@ -33,11 +33,11 @@ class GroupController extends Controller
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'view', 'create', 'update', 'delete', 'deletefile', 'list', 'goods', ],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'deletefile', 'list', 'goods', 'allgroup', ],
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'view', 'goods', ],
+                        'actions' => ['index', 'view', 'goods', 'allgroup', ],
                         'roles' => ['?', User::GROUP_CLIENT, User::GROUP_OPERATOR],
                     ],
                     [
@@ -84,6 +84,21 @@ class GroupController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all Group models.
+     * @return mixed
+     */
+    public function actionAllgroup()
+    {
+        $searchModel = new GroupSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('allgroup', [
+            'searchGroup' => $searchModel,
+            'dataGroup' => $dataProvider,
         ]);
     }
 
