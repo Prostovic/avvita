@@ -178,7 +178,7 @@ EOT;
         ->field(
             $model,
             'file' . ($bMultiple ? '[]' : ''),
-            ['template' => "{input}{error}"]
+            ['template' => "{input}{error}{hint}"]
         )
         ->widget(
             FileInput::classname(),
@@ -188,7 +188,8 @@ EOT;
                 ],
                 'pluginOptions' => $pluginOptions,
             ]
-        );
+        )
+        ->hint('Размер изображения 500 * 300 точек');
 
     if( count($aImages) > 0 ) {
 //        echo '</div>';

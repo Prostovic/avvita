@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\FileForm;
@@ -94,6 +95,8 @@ class ImportController extends Controller
         return $this->render('fileform', [
             'model' => $model,
             'title' => 'Загрузка данных по Городам',
+            'comment' => 'Файл с данными должен содержать 2 колонки с данными: номер и название.<br />' . "\n"
+                        . 'Первая строка файла будет проигнорирована (предполагается, что там стоят заголовки колонок).',
         ]);
     }
 
@@ -149,6 +152,8 @@ class ImportController extends Controller
         return $this->render('fileform', [
             'model' => $model,
             'title' => 'Загрузка данных по Организациям',
+            'comment' => 'Файл с данными должен содержать 2 колонки с данными: номер и название.<br />' . "\n"
+                . 'Первая строка файла будет проигнорирована (предполагается, что там стоят заголовки колонок).',
         ]);
     }
 
@@ -195,9 +200,18 @@ class ImportController extends Controller
             }
             return $this->refresh();
         }
+
+        $sTestData = <<<EOT
+<BONUSES>
+	<BONUS НомерДокумента="30051500010" ДатаДокумента="01.06.2015" ПолныйНомерЗаказа="АВВ-038672" НомерЗаказа="406001006" КодКонтрагента="000000871" НоменклатураХарактеристика="Multigressiv Mono 1.60 - STK, -04.00,  -1.00,  0.00,  70,  Ultrasin,  Безфильтра,  R" Количество="1" Сумма="5"/>
+</BONUSES>
+EOT;
+
         return $this->render('fileform', [
             'model' => $model,
             'title' => 'Импорт xml по заказам',
+            'comment' => 'Файл должет содержать структуру, аналогичную следующей:<br />' . "\n"
+                        . nl2br(Html::encode($sTestData)),
         ]);
     }
 

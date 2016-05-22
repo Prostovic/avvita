@@ -33,7 +33,17 @@ $this->params['breadcrumbs'][] = $this->title;
 //            'gd_imagepath',
 //            'gd_description:ntext',
             'gd_price',
-            'gd_number',
+//            'gd_number',
+            [
+                'class' => 'yii\grid\DataColumn',
+                'attribute' => 'gd_number',
+                'format' => 'raw',
+                'filter' => Group::getAllgroups(),
+                'value' => function ($model, $key, $index, $column) {
+                    /** @var Good $model */
+                    return $model->gd_number > 0 ? $model->gd_number : '';
+                }
+            ],
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'groupid',

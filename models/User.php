@@ -359,6 +359,7 @@ class User extends ActiveRecord implements IdentityInterface
             }
         }
     }
+
     /**
      * @return array
      */
@@ -369,6 +370,14 @@ class User extends ActiveRecord implements IdentityInterface
             3 => 'Продавец-консультант',
             4 => 'Другое',
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPosition() {
+        $a = $this->getPositions();
+        return isset($a[$this->us_position]) ? $a[$this->us_position] : '';
     }
 
     /**
@@ -549,6 +558,26 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(
             Userorder::className(),
             ['ord_us_id' => 'us_id']
+        );
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCity() {
+        return $this->hasOne(
+            City::className(),
+            ['city_id' => 'us_city_id']
+        );
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrg() {
+        return $this->hasOne(
+            Org::className(),
+            ['org_id' => 'us_org_id']
         );
     }
 

@@ -29,13 +29,14 @@ $columns = [
             return ($model->org ? Html::encode($model->org->org_name) : '--');
         }
     ],
+    'doc_title',
     // 'doc_org_id',
     // 'doc_title',
     // 'doc_number',
     // 'doc_summ',
     // 'doc_created',
 
-    ['class' => 'yii\grid\ActionColumn'],
+//    ['class' => 'yii\grid\ActionColumn'],
 ];
 
 ?>

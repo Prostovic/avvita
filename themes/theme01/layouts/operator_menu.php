@@ -37,7 +37,7 @@ echo Nav::widget([
                 ['label' => 'Пользовательские', 'url' => ['userdata/index', ]],
                 '<li class="dropdown-header">Введенные пользователями</li>',
                 '<li class="divider"></li>',
-                ['label' => 'Дополнительные', 'url' => ['docdata/bonusindex', ]],
+                ['label' => 'Дополнительные баллы', 'url' => ['docdata/bonusindex', ]],
                 '<li class="dropdown-header">Ручное добавление</li>',
             ],
         ],

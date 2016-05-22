@@ -95,7 +95,7 @@ class XmlConverter {
         while ($reader->read()) {
             switch ($reader->nodeType) {
                 case (XMLReader::ELEMENT):
-                    // если находим в xml элемент <item> начинаем обрабатывать его
+                    // если находим в xml элемент <BONUS> начинаем обрабатывать его
                     if ($reader->localName == 'BONUS') {
                         // мы будем формировать массив который будет содержать все дочерние элементы элемента <item>
                         $item = array();

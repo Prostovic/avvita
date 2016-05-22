@@ -10,7 +10,7 @@ use app\models\Org;
 /* @var $searchModel app\models\DocdataSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Заказы';
+$this->title = 'Дополнительные баллы';
 $this->params['breadcrumbs'][] = $this->title;
 
 $columns = [

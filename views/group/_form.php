@@ -154,7 +154,7 @@ EOT;
                 ->field(
                     $model,
                     'file',
-                    ['template' => "{input}{error}"]
+                    ['template' => "{input}{error}{hint}"]
                 )
                 ->widget(
                     FileInput::classname(),
@@ -164,7 +164,8 @@ EOT;
                         ],
                         'pluginOptions' => $pluginOptions,
                     ]
-                );
+                )
+            ->hint('Размер изображения 500 * 300 точек');
 
             ?>
         </div>
