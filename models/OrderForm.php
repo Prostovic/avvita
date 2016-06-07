@@ -43,13 +43,13 @@ class OrderForm extends Model
      */
     public function testOrder($attribute, $params)
     {
-        $nCou = Yii::$app
-            ->db
-            ->createCommand('Select COUNT(*) From ' . Docdata::tableName() . ' Where '.self::DOCDATA_FIELD_NUM.' = :ordernum', [':ordernum' => $this->{$attribute}])
-            ->queryScalar();
-        if( $nCou < 1 ) {
-            $this->addError($attribute, 'Заказ в системе не найден.');
-        }
+//        $nCou = Yii::$app
+//            ->db
+//            ->createCommand('Select COUNT(*) From ' . Docdata::tableName() . ' Where '.self::DOCDATA_FIELD_NUM.' = :ordernum', [':ordernum' => $this->{$attribute}])
+//            ->queryScalar();
+//        if( $nCou < 1 ) {
+//            $this->addError($attribute, 'Заказ в системе не найден.');
+//        }
 
         $nCou = Yii::$app
             ->db
@@ -62,16 +62,16 @@ class OrderForm extends Model
             $this->addError($attribute, 'Заказ уже есть в Вашем списке.');
         }
         else {
-            $nCou = Yii::$app
-                ->db
-                ->createCommand(
-                    'Select COUNT(*) From ' . Userdata::tableName() . ' Where ud_doc_key = :ordernum',
-                    [':ordernum' => $this->{$attribute}, ]
-                )
-                ->queryScalar();
-            if( $nCou > 0 ) {
-                $this->addError($attribute, 'Заказ уже закреплен за пользователем.');
-            }
+//            $nCou = Yii::$app
+//                ->db
+//                ->createCommand(
+//                    'Select COUNT(*) From ' . Userdata::tableName() . ' Where ud_doc_key = :ordernum',
+//                    [':ordernum' => $this->{$attribute}, ]
+//                )
+//                ->queryScalar();
+//            if( $nCou > 0 ) {
+//                $this->addError($attribute, 'Заказ уже закреплен за пользователем.');
+//            }
         }
 
     }
