@@ -27,7 +27,7 @@ echo Nav::widget([
             'url' => ['/'],
             'active' => Yii::$app->defaultRoute == Yii::$app->controller->getRoute(),
         ],
-//            ['label' => 'About', 'url' => ['/site/about']],
+        ['label' => 'О нас', 'url' => ['/site/about']],
 //            ['label' => 'Contact', 'url' => ['/site/contact']],
         Yii::$app->user->isGuest ?
         ['label' => 'Вход', 'url' => ['/site/login']] :

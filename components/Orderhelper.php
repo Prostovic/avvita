@@ -208,7 +208,8 @@ class Orderhelper {
 //        Yii::info('validateOrder() nSumm = ' . $nSumm . ' nUserMoney = ' . $nUserMoney);
 
         if( $nSumm > $nUserMoney ) {
-            $sErr = 'Максимальная сумма заказа не должна превышать ' . $nUserMoney;
+//            $sErr = 'Максимальная сумма заказа не должна превышать ' . $nUserMoney;
+            $sErr = 'Не хватает баллов';
             $model->addError('ord_id', $sErr);
         }
     }

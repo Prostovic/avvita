@@ -4,15 +4,25 @@
 
 use yii\helpers\Html;
 
-$this->title = 'About';
+$this->title = 'О нас';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-about">
-    <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        This is the About page. You may modify the following file to customize its content:
-    </p>
+<div class="site-about" style="text-align: center;">
+<!--    <h1>--><?= '' // Html::encode($this->title) ?><!--</h1>-->
+<p>&laquo;Бонус – портал&raquo; – ваш пропуск в мир подарков!</p>
 
-    <code><?= __FILE__ ?></code>
+<p><strong>Уважаемые коллеги!</strong></p>
+
+<p>Приглашаем вас присоединиться к бонусной программе компании Аввита.<br />
+Теперь, благодаря накопительной программе &laquo;Бонус – портал&raquo;, вы<br />
+будете получать бонусные баллы за каждый заказ линз Rodenstock,<br />
+которые впоследствии сможете потратить на приятные подарки.</p>
+
+<p>Все, что требуется от вас – это зарегистрироваться в программе и<br />
+не забывать вносить номера своих заказов, все остальное система<br />
+сделает за Вас. Предлагайте клиентам продукцию концерна<br />
+Rodenstock, копите баллы, выбирайте подарки<br />
+и пусть работа приносит вам радость.</p>
+<p><a href="" class="btn btn-success">РЕГИСТРАЦИЯ</a></p>
 </div>

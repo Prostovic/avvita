@@ -43,13 +43,13 @@ class OrderForm extends Model
      */
     public function testOrder($attribute, $params)
     {
-//        $nCou = Yii::$app
-//            ->db
-//            ->createCommand('Select COUNT(*) From ' . Docdata::tableName() . ' Where '.self::DOCDATA_FIELD_NUM.' = :ordernum', [':ordernum' => $this->{$attribute}])
-//            ->queryScalar();
-//        if( $nCou < 1 ) {
-//            $this->addError($attribute, 'Заказ в системе не найден.');
-//        }
+        $nCou = Yii::$app
+            ->db
+            ->createCommand('Select COUNT(*) From ' . Docdata::tableName() . ' Where '.self::DOCDATA_FIELD_NUM.' = :ordernum', [':ordernum' => $this->{$attribute}])
+            ->queryScalar();
+        if( $nCou < 1 ) {
+            $this->addError($attribute, 'Заказ в системе не найден.');
+        }
 
         $nCou = Yii::$app
             ->db

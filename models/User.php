@@ -39,6 +39,7 @@ use app\components\Notificator;
  * @property integer $us_getnews
  * @property integer $us_getstate
  * @property string $us_op_key
+ * @property string $password_repeat
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -52,6 +53,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     public $isAgree;
     public $password = '';
+    public $password_repeat = '';
 
     public $docSumm = 0;
     public $orderSumm = 0;
@@ -177,10 +179,12 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function rules()
     {
-        return [
+
+        $a = [
             [['us_fam', 'us_name', 'us_email', 'us_adr_post', 'us_birth', 'us_position', 'us_city', 'us_org', 'us_getnews', 'us_getstate', 'us_city_id', 'us_org_id', ], 'required'],
             [['us_fam', 'us_name', 'us_otch', 'us_city', ], 'app\components\CapitalizeFilter'],
             [['isAgree', ], 'required', 'on' => ['register']],
+
             [['isAgree', ], 'compare', 'compareValue' => 1, 'message' => 'Необходимо отметить {attribute}', 'on' => ['register']],
             [['password', ], 'required', 'on'=>['register', 'setnewpassword', ]],
             [['password', ], 'required', 'when'=> function($model) { return $model->isNewRecord; }],
@@ -195,8 +199,14 @@ class User extends ActiveRecord implements IdentityInterface
             [['us_phone'], 'string', 'max' => 24],
             [['us_phone'], 'match', 'pattern' => '|\\+[\\d]+\\([\\d]+\\)[-\\d]{7,9}|'],
             [['us_adr_post', 'us_pass', 'us_city', 'us_org', 'us_op_key', ], 'string', 'max' => 255],
-            [['us_group'], 'string', 'max' => 16]
+            [['us_group'], 'string', 'max' => 16],
+            [['password', ], 'compare', 'on' => ['register']]
         ];
+
+//        if( $this->isNewRecord ) {
+//            $a[] = [['password_repeat', ], 'compare', 'on' => ['register']];
+//        }
+        return $a;
     }
 
     /**
@@ -234,6 +244,7 @@ class User extends ActiveRecord implements IdentityInterface
             'us_birth' => 'Дата рождения',
             'us_pass' => 'Пароль',
             'password' => 'Пароль',
+            'password_repeat' => 'Повтор пароля',
             'us_position' => 'Специализация',
             'us_city' => 'Город',
             'us_org' => 'Организация',
@@ -274,6 +285,7 @@ class User extends ActiveRecord implements IdentityInterface
             'us_adr_post',
             'us_birth',
             'password',
+            'password_repeat',
             'us_position',
             'us_city',
             'us_org',

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -49,9 +49,9 @@ $bClientForm = ($model->us_group != User::GROUP_OPERATOR) && ($model->us_group !
 
     <div class="clearfix"></div>
 
-    <?= $form->field($model, 'us_email')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_email')]) ?>
+    <?= $bClientForm ? $form->field($model, 'us_city')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_city')]) : '' ?>
 
-    <?= $form->field($model, 'password')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('password')]) ?>
+    <?= $bClientForm ? $form->field($model, 'us_org')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_org')]) : '' ?>
 
     <?= '' // $form->field($model, 'us_phone')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_phone')]) ?>
     <?= $form->field($model, 'us_phone')->widget(MaskedInput::classname(), [
@@ -68,10 +68,16 @@ $bClientForm = ($model->us_group != User::GROUP_OPERATOR) && ($model->us_group !
 
     <div class="clearfix"></div>
 
-    <?= $bClientForm ? $form->field($model, 'us_city')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_city')]) : '' ?>
+    <?= $form->field($model, 'us_email')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_email')]) ?>
 
-    <?= $bClientForm ? $form->field($model, 'us_org')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_org')]) : '' ?>
+    <?= $form->field($model, 'password')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('password')]) ?>
 
+    <?php if( $model->isNewRecord ) { ?>
+    <?= $form->field($model, 'password_repeat')->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('password_repeat')]) ?>
+
+    <div class="clearfix"></div>
+
+    <?php } ?>
     <?= $bClientForm ? $form->field($model, 'us_adr_post', ['options' => ['class' => 'form-group col-md-6'],])->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('us_adr_post')]) : '' ?>
 
     <?php if( false ): ?>

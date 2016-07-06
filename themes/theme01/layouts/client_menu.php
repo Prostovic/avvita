@@ -47,6 +47,7 @@ echo Nav::widget([
             'url' => ['/'],
             'active' => Yii::$app->defaultRoute == Yii::$app->controller->getRoute(),
         ],
+        ['label' => 'О нас', 'url' => ['/site/about']],
         [
             'label' => 'Подарки',
             'items' => [
